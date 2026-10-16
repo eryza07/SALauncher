@@ -348,7 +348,7 @@ abstract class Launcher(
         args.purgeArg("-XX:ActiveProcessorCount")
 
         //Add automatically generated args (PRD SH-02: Adaptive Heap Limiter)
-        val adaptiveHeap = calculateAdaptiveHeap(GlobalContext.appContext, ramAllocation)
+        val adaptiveHeap = calculateAdaptiveHeap(GlobalContext, ramAllocation)
         LoggerBridge.appendInfo("AdaptiveHeapLimiter: TotalRAM=${adaptiveHeap.totalRamMb}MB, ReservedOS=${adaptiveHeap.reservedOsMb}MB, Requested=${ramAllocation}MB -> -Xms${adaptiveHeap.initialHeapMb}M -Xmx${adaptiveHeap.maxHeapMb}M (Capped=${adaptiveHeap.wasCapped})")
 
         args.add("-Xms${adaptiveHeap.initialHeapMb}M")
