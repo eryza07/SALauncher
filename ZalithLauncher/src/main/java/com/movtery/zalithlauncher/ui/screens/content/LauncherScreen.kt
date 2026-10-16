@@ -93,6 +93,7 @@ import com.movtery.zalithlauncher.ui.components.SkinPreview3D
 import com.movtery.zalithlauncher.ui.guide.GuideKeys
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
+import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
 import com.movtery.zalithlauncher.ui.screens.content.elements.CommonVersionInfoLayout
 import com.movtery.zalithlauncher.ui.screens.content.elements.PlayerFace
 import com.movtery.zalithlauncher.ui.screens.content.elements.VersionIconImage
