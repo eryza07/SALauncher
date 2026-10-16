@@ -22,6 +22,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import coil3.SingletonImageLoader
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -344,7 +345,12 @@ class MainActivity : BaseAppCompatActivity() {
                         eventViewModel = eventViewModel,
                         launchGameViewModel = launchGameViewModel,
                         exitActivity = {
+                            // PRD MH-01 & US-01: Aggressive Activity Unload & Memory Trimming
+                            runCatching {
+                                SingletonImageLoader.get(this@MainActivity).memoryCache?.clear()
+                            }
                             this@MainActivity.finish()
+                            System.gc()
                         },
                         ensureVulkanSupported = vulkanCheckerViewModel::ensureSupported,
                         submitError = {
@@ -534,7 +540,11 @@ class MainActivity : BaseAppCompatActivity() {
     override fun onDestroy() {
         fmEventRegistrar?.stop()
         fmEventRegistrar = null
+        runCatching {
+            SingletonImageLoader.get(this).memoryCache?.clear()
+        }
         super.onDestroy()
+        System.gc()
     }
 
     /**

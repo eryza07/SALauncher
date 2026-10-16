@@ -86,7 +86,8 @@ object RendererPluginManager: ApkPluginManager() {
             val metaData = info.metaData ?: return
             if (
                 metaData.getBoolean("fclPlugin", false) ||
-                metaData.getBoolean("zalithRendererPlugin", false)
+                metaData.getBoolean("zalithRendererPlugin", false) ||
+                metaData.getBoolean("saRendererPlugin", false)
             ) {
                 val packageManager = context.packageManager
                 val packageName = info.packageName

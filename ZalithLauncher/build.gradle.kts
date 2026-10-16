@@ -13,6 +13,7 @@ plugins {
     id("com.movtery.buildkeys")
 }
 
+val launcherPackageName = project.findProperty("launcher_package_name") as? String ?: "com.eryza.salauncher"
 val zalithPackageName = "com.movtery.zalithlauncher"
 val launcherAPPName = project.findProperty("launcher_app_name") as? String ?: error("The \"launcher_app_name\" property is not set in gradle.properties.")
 val launcherName = project.findProperty("launcher_name") as? String ?: error("The \"launcher_name\" property is not set in gradle.properties.")
@@ -64,8 +65,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = zalithPackageName
-        applicationIdSuffix = ".v2"
+        applicationId = launcherPackageName
         minSdk = 26
         targetSdk = 34
         versionCode = launcherVersionCode
@@ -85,7 +85,6 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             signingConfig = signingConfigs.getByName("debugBuild")
         }

@@ -32,7 +32,9 @@ enum class VersionFolders(val folderName: String) {
     /** 光影包文件夹 */
     SHADERS("shaderpacks"),
     /** 截屏文件夹 */
-    SCREENSHOTS("screenshots");
+    SCREENSHOTS("screenshots"),
+    /** 配置文件文件夹 */
+    CONFIG("config");
 
     fun getDir(gameDir: String): String {
         return File(gameDir, folderName).absolutePath

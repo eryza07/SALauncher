@@ -92,6 +92,11 @@ object PluginLoader {
             RendererV2PluginManager.removeRenderer(failedToLoadList)
         }
 
+        // 加载模块化 .so 渲染器插件 (plugins/renderers/)
+        com.movtery.zalithlauncher.game.plugin.renderer.modular.ModularRendererPluginManager.loadPlugins(context).forEach { plugin ->
+            Renderers.addRenderer(plugin)
+        }
+
         // 去重已加载的插件
         val seenPackages = mutableSetOf<String>()
         apkPluginList.removeAll { !seenPackages.add(it.packageName) }

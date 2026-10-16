@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.screens.content
 
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalDashboard
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -49,6 +50,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -164,11 +166,26 @@ fun LauncherScreen(
             val cardWidth = maxWidth * (ActionMenuWeight / (ActionMenuWeight + ContentWeight)) - ActionMenuOuterPadding
             val cardHeight = maxHeight - ActionMenuOuterPadding * 2
 
+            val accounts by AccountsManager.accountsFlow.collectAsStateWithLifecycle()
+            var hasAutoPromptedLogin by rememberSaveable { mutableStateOf(false) }
+
             val toAccountManageScreen: () -> Unit = {
+                val hasAccounts = accounts.isNotEmpty()
                 backStackViewModel.mainScreen.navigateTo(
-                    screenKey = NormalNavKey.AccountManager(FirstLoginMenu.NONE)
+                    screenKey = NormalNavKey.AccountManager(
+                        if (hasAccounts) FirstLoginMenu.NONE else FirstLoginMenu.NORMAL
+                    )
                 )
             }
+
+            // Jika pertama kali buka aplikasi dan belum ada akun, pandu langsung ke menu login (Microsoft / Offline / Ely.by)
+            LaunchedEffect(accounts) {
+                if (accounts.isEmpty() && !hasAutoPromptedLogin) {
+                    hasAutoPromptedLogin = true
+                    toAccountManageScreen()
+                }
+            }
+
             val toVersionManageScreen: () -> Unit = {
                 backStackViewModel.mainScreen.removeAndNavigateTo(
                     remove = NestedNavKey.VersionSettings::class,
@@ -181,72 +198,25 @@ fun LauncherScreen(
                 }
             }
 
-            // 内容区域
-            Row(modifier = Modifier.fillMaxSize()) {
-                // ActionMenu 对接到了 Start，留出空位
-                if (dockedSide == ActionMenuSide.START) {
-                    Spacer(modifier = Modifier.weight(ActionMenuWeight))
-                }
-
-                CompositionLocalProvider(
-                    LocalUriHandler provides object : UriHandler {
-                        override fun openUri(uri: String) {
-                            onOpenLink(uri)
-                        }
-                    }
-                ) {
-                ContentMenu(
-                    modifier = Modifier
-                        .guideNode(
-                            key = GuideKeys.Main.Step.CardTip,
-                            holeRadius = 0.dp
-                        )
-                        .weight(ContentWeight)
-                        .offset { IntOffset(x = dragState.previewShift.value.roundToInt(), y = 0) },
-                    isVisible = isVisible,
-                    onLaunchGame = { version ->
-                        onLaunchGame(version)
-                    },
-                    onQuickPlayServer = onQuickPlayServer,
-                    onOpenVersionSettings = navigateToVersions
-                )
-                }
-
-                // ActionMenu 对接到了 End，留出空位
-                if (dockedSide == ActionMenuSide.END) {
-                    Spacer(modifier = Modifier.weight(ActionMenuWeight))
-                }
-            }
-
-            val isActionMenuTaller = maxHeight >= 600.dp
-            CompositionLocalProvider(LocalActionMenuDrag provides dragState) {
-                Box(
-                    modifier = Modifier
-                        .offset {
-                            val translation = if (dragState.floating) {
-                                dragState.cardPosition
-                            } else {
-                                dragState.landingOf(effectiveSide) + dragState.settleOffset.value
-                            }
-                            val x = if (isRtl) parentWidthPx - cardWidth.toPx() - translation.x else translation.x
-                            IntOffset(x.roundToInt(), translation.y.roundToInt())
-                        }
-                        .size(cardWidth, cardHeight)
-                ) {
-                    ActionMenu(
-                        modifier = Modifier.fillMaxSize(),
-                        isVisible = isVisible,
-                        isTaller = isActionMenuTaller,
-                        dockedSide = dockedSide,
-                        onLaunchGame = onLaunchGame,
-                        swapTargetValue = if (dockedSide == ActionMenuSide.END) 40.dp else (-40).dp,
-                        pickUpScale = { dragState.scale },
-                        toAccountManageScreen = toAccountManageScreen,
-                        toVersionManageScreen = toVersionManageScreen,
-                        toVersionSettingsScreen = toVersionSettingsScreen
+            NeobrutalDashboard(
+                modifier = Modifier.fillMaxSize(),
+                onLaunchGame = onLaunchGame,
+                toAccountManageScreen = toAccountManageScreen,
+                toVersionManageScreen = toVersionManageScreen,
+                toVersionSettingsScreen = toVersionSettingsScreen,
+                toDownloadScreen = {
+                    backStackViewModel.mainScreen.removeAndNavigateTo(
+                        removes = backStackViewModel.clearBeforeNavKeys,
+                        screenKey = backStackViewModel.downloadScreen
+                    )
+                },
+                toSettingsScreen = {
+                    backStackViewModel.mainScreen.removeAndNavigateTo(
+                        removes = backStackViewModel.clearBeforeNavKeys,
+                        screenKey = backStackViewModel.settingsScreen
                     )
                 }
-            }
+            )
         }
     }
 }

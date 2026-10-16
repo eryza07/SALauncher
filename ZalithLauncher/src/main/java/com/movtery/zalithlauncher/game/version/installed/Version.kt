@@ -195,7 +195,14 @@ class Version(
      * @return 获取版本的游戏文件夹路径（若开启了版本隔离，则路径为版本文件夹）
      */
     fun getGameDir(): File {
-        return if (versionConfig.isIsolation()) getVersionPath()
+        return if (versionConfig.isIsolation()) {
+            val instanceDir = File(PathManager.DIR_INSTANCES, versionName)
+            if (instanceDir.exists() && instanceDir.isDirectory) {
+                instanceDir
+            } else {
+                getVersionPath()
+            }
+        }
         //未开启版本隔离可以使用自定义路径，如果自定义路径为空（则为未设置），那么返回默认游戏路径（.minecraft/）
         else if (versionConfig.customPath.isNotEmpty()) File(versionConfig.customPath)
         else File(gameHome)

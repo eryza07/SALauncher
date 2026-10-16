@@ -61,19 +61,67 @@ fun getUsedMemory(context: Context): Long {
 fun getFreeMemory(context: Context) = getMemoryInfo(context).availMem
 
 /**
+ * Hasil perhitungan Adaptive Heap Limiter (SH-02).
+ */
+data class AdaptiveHeapResult(
+    val initialHeapMb: Int, // Digunakan untuk -Xms
+    val maxHeapMb: Int,     // Digunakan untuk -Xmx
+    val totalRamMb: Int,
+    val reservedOsMb: Int,
+    val wasCapped: Boolean
+)
+
+/**
+ * Adaptive Heap Limiter (PRD SH-02):
+ * Menghitung batas alokasi JVM aman (-Xmx & -Xms) secara dinamis
+ * dengan menyisakan minimal 1.2 GB (1200 MB) RAM untuk OS Android,
+ * guna mencegah penghentian paksa oleh Android Low Memory Killer (LMK / Signal 9).
+ */
+@WorkerThread
+fun calculateAdaptiveHeap(context: Context, requestedRamMb: Int): AdaptiveHeapResult {
+    val totalRam = getTotalMemory(context).bytesToMB().toInt()
+
+    // Sisakan minimal 1200 MB untuk OS Android pada RAM >= 3GB, atau 768 MB pada perangkat <= 2GB
+    val osReserve = if (totalRam <= 2048) 768 else 1200
+
+    // Batas aman maksimal JVM game
+    val safeMaxRam = if (Architecture.is32BitsDevice) {
+        min(1024, (totalRam - 512).coerceAtLeast(384))
+    } else {
+        (totalRam - osReserve).coerceAtLeast(512)
+    }
+
+    val wasCapped = requestedRamMb > safeMaxRam
+    val effectiveMax = if (wasCapped) safeMaxRam else requestedRamMb
+
+    // Alokasi awal (-Xms) tidak boleh langsung sama dengan -Xmx agar OS tidak kekurangan memori saat start
+    val initialHeap = min(512, (effectiveMax / 2)).coerceAtLeast(256)
+
+    return AdaptiveHeapResult(
+        initialHeapMb = initialHeap,
+        maxHeapMb = effectiveMax,
+        totalRamMb = totalRam,
+        reservedOsMb = osReserve,
+        wasCapped = wasCapped
+    )
+}
+
+/**
  * 为设置项获取最大可设置的内存值（为系统预留一些可用内存）
+ * PRD SH-02: Menjamin alokasi menyisakan minimal 1200 MB untuk OS Android.
  */
 @WorkerThread
 fun getMaxMemoryForSettings(context: Context): Int {
     val deviceRam = getTotalMemory(context).bytesToMB()
     val maxRam: Int = if (Architecture.is32BitsDevice || deviceRam < 2048) {
-        min(1024.0, deviceRam).toInt()
+        min(1024.0, (deviceRam - 512).coerceAtLeast(384.0)).toInt()
     } else {
-        //To have a minimum for the device to breathe
-        (deviceRam - (if (deviceRam < 3064) 800 else 1024)).toInt()
+        // Sisakan minimal 1200 MB agar OS Android bernapas lega (PRD SH-02)
+        (deviceRam - 1200).coerceAtLeast(512.0).toInt()
     }
     return maxRam
 }
+
 
 /**
  * 转换为 MB 单位

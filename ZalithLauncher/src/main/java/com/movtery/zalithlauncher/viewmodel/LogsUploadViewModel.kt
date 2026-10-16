@@ -26,6 +26,7 @@ import androidx.lifecycle.viewModelScope
 import com.movtery.zalithlauncher.crashlogs.AbstractAPI
 import com.movtery.zalithlauncher.crashlogs.LinkNotFoundException
 import com.movtery.zalithlauncher.crashlogs.MCLogsResponse
+import com.movtery.zalithlauncher.crashlogs.SmartCrashAnalyzer
 import com.movtery.zalithlauncher.crashlogs.platform.MCLogsAPI
 import com.movtery.zalithlauncher.crashlogs.platform.MirroredAPI
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.ShareLinkOperation
@@ -62,20 +63,11 @@ class LogsUploadViewModel: ViewModel() {
     fun check(logFile: File) {
         checkJob?.cancel()
         checkJob = viewModelScope.launch(Dispatchers.IO) {
-            //2MB 已经不适合上传，容易超时
-            //这种日志可能是缺某种库，狂刷 Y/N 类提醒导致的
-            val canUpload0 = !logFile.exceeds2MB()
+            val canUpload0 = logFile.exists() && logFile.isFile && logFile.length() > 0
             withContext(Dispatchers.Main) {
                 canUpload = canUpload0
             }
         }
-    }
-
-    /**
-     * 检查文件是否超过 2MB
-     */
-    private fun File.exceeds2MB(): Boolean {
-        return !exists() && !isFile && length() > 2 * 1024 * 1024
     }
 
     private suspend fun <E: AbstractAPI> mirroredAPI(
@@ -121,10 +113,9 @@ class LogsUploadViewModel: ViewModel() {
     ) {
         uploadJob?.cancel()
         uploadJob = viewModelScope.launch(Dispatchers.IO) {
-            if (logFile.exceeds2MB()) return@launch
-
-            //读取内容并尝试上传
-            val content = logFile.readText()
+            // Mempersiapkan payload log cerdas (PRD FR-005 & Section 12)
+            val content = SmartCrashAnalyzer.prepareLogForUpload(logFile)
+            if (content.isBlank()) return@launch
 
             val apiList = if (isChinaMainland()) {
                 listOf(MirroredAPI, MCLogsAPI)

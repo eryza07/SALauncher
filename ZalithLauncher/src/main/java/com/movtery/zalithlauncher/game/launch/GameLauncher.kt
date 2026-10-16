@@ -211,7 +211,20 @@ class GameLauncher(
         super.dlopenEngine()
         appendTitle("DLOPEN Renderer")
 
-        //声音引擎加载后，dlopen渲染器的库
+        // 渲染器库加载前进行 GPU 兼容性检查与 dlopen
+        val currentRenderer = runCatching { com.movtery.zalithlauncher.game.renderer.Renderers.getCurrentRenderer() }.getOrNull()
+        if (currentRenderer != null) {
+            val compat = com.movtery.zalithlauncher.utils.platform.GpuDetector.checkCompatibility("${currentRenderer.getRendererName()} ${currentRenderer.getRendererId()}")
+            if (compat is com.movtery.zalithlauncher.utils.platform.GpuDetector.CompatibilityResult.Warning) {
+                Logger.warning(TAG, compat.message)
+                appendInfo("Renderer Compatibility: ${compat.message}")
+            }
+            val libs by currentRenderer.getDlopenLibrary()
+            libs.forEach { libPath ->
+                ZLBridge.dlopen(libPath)
+            }
+        }
+
         RendererPluginManager.selectedRendererPlugin?.let { renderer ->
             val libs by renderer.getDlopenLibrary()
             libs.forEach { libPath ->

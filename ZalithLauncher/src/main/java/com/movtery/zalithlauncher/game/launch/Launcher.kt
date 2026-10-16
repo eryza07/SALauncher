@@ -42,6 +42,7 @@ import com.movtery.zalithlauncher.path.LibPath
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.setting.unit.getOrMin
+import com.movtery.zalithlauncher.utils.platform.calculateAdaptiveHeap
 import com.movtery.zalithlauncher.utils.device.Architecture
 import com.movtery.zalithlauncher.utils.device.Architecture.ARCH_X86
 import com.movtery.zalithlauncher.utils.device.Architecture.is64BitsDevice
@@ -346,10 +347,12 @@ abstract class Launcher(
         // Overridden by us to specify the exact number of cores that the android system has
         args.purgeArg("-XX:ActiveProcessorCount")
 
-        //Add automatically generated args
-        val ramAllocationString = ramAllocation.toString()
-        args.add("-Xms${ramAllocationString}M")
-        args.add("-Xmx${ramAllocationString}M")
+        //Add automatically generated args (PRD SH-02: Adaptive Heap Limiter)
+        val adaptiveHeap = calculateAdaptiveHeap(GlobalContext.appContext, ramAllocation)
+        LoggerBridge.appendInfo("AdaptiveHeapLimiter: TotalRAM=${adaptiveHeap.totalRamMb}MB, ReservedOS=${adaptiveHeap.reservedOsMb}MB, Requested=${ramAllocation}MB -> -Xms${adaptiveHeap.initialHeapMb}M -Xmx${adaptiveHeap.maxHeapMb}M (Capped=${adaptiveHeap.wasCapped})")
+
+        args.add("-Xms${adaptiveHeap.initialHeapMb}M")
+        args.add("-Xmx${adaptiveHeap.maxHeapMb}M")
 
         args.add("-Dorg.lwjgl.openal.libname=${PathManager.DIR_NATIVE_LIB}/libopenal.so")
 

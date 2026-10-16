@@ -22,22 +22,29 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.context.COPY_LABEL_LINK
+import com.movtery.zalithlauncher.crashlogs.SmartCrashAnalyzer
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.ui.base.BaseAppCompatActivity
 import com.movtery.zalithlauncher.ui.screens.main.ErrorScreen
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.ShareLinkOperation
 import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
 import com.movtery.zalithlauncher.ui.theme.backgroundColor
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalCrashDialog
 import com.movtery.zalithlauncher.ui.theme.onBackgroundColor
 import com.movtery.zalithlauncher.utils.copyText
 import com.movtery.zalithlauncher.utils.file.shareFile
@@ -95,17 +102,21 @@ class ErrorActivity : BaseAppCompatActivity() {
 
         val exitType = extras.getString(BUNDLE_EXIT_TYPE, EXIT_LAUNCHER)
 
+        val jvmCrash = if (exitType == EXIT_JVM) {
+            extras.getParcelableSafely(BUNDLE_JVM_CRASH, JvmCrash::class.java)
+        } else null
+
         val errorMessage = when (exitType) {
             EXIT_JVM -> {
-                val jvmCrash = extras.getParcelableSafely(BUNDLE_JVM_CRASH, JvmCrash::class.java) ?: return runFinish()
-                val messageResId = if (jvmCrash.isSignal) R.string.crash_singnal_message else R.string.crash_exit_message
-                val message = getString(messageResId, jvmCrash.code)
+                val crash = jvmCrash ?: return runFinish()
+                val messageResId = if (crash.isSignal) R.string.crash_singnal_message else R.string.crash_exit_message
+                val message = getString(messageResId, crash.code)
                 val messageBody = getString(R.string.crash_exit_note)
                 ErrorMessage(
                     message = message,
                     messageBody = messageBody,
                     crashType = CrashType.GAME_CRASH,
-                    logFile = File(jvmCrash.logPath).also { file ->
+                    logFile = File(crash.logPath).also { file ->
                         //检查日志文件是否适合上传
                         viewModel.check(file)
                     }
@@ -128,8 +139,15 @@ class ErrorActivity : BaseAppCompatActivity() {
         val canRestart: Boolean = extras.getBoolean(BUNDLE_CAN_RESTART, true)
         val logExists = logFile.exists() && logFile.isFile
 
+        // Smart Crash Analyzer (PRD MH-02 & FR-004)
+        val crashAnalysis = if (jvmCrash != null) {
+            SmartCrashAnalyzer.analyze(logFile, jvmCrash.code, jvmCrash.isSignal)
+        } else null
+
         setContent {
             ZalithLauncherTheme {
+                var showNeobrutalDialog by remember { mutableStateOf(crashAnalysis != null) }
+
                 ShareLinkOperation(
                     operation = viewModel.operation,
                     onChange = { viewModel.operation = it },
@@ -138,6 +156,7 @@ class ErrorActivity : BaseAppCompatActivity() {
                         viewModel.upload(logFile) { link ->
                             openLink(link)
                             copyText(COPY_LABEL_LINK, link, this@ErrorActivity)
+                            Toast.makeText(this@ErrorActivity, "Tautan mclo.gs disalin ke clipboard!", Toast.LENGTH_SHORT).show()
                         }
                     }
                 )
@@ -175,6 +194,29 @@ class ErrorActivity : BaseAppCompatActivity() {
                         Text(
                             text = errorMessage.messageBody,
                             style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+
+                    if (crashAnalysis != null && showNeobrutalDialog) {
+                        NeobrutalCrashDialog(
+                            isVisible = showNeobrutalDialog,
+                            diagnosisTitle = crashAnalysis.title,
+                            causeText = crashAnalysis.cause,
+                            recommendations = crashAnalysis.recommendations,
+                            rawLog = crashAnalysis.rawLogSnippet,
+                            onDismiss = {
+                                showNeobrutalDialog = false
+                            },
+                            onUploadMclogs = {
+                                viewModel.upload(logFile) { link ->
+                                    openLink(link)
+                                    copyText(COPY_LABEL_LINK, link, this@ErrorActivity)
+                                    Toast.makeText(this@ErrorActivity, "Tautan mclo.gs disalin ke clipboard!", Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            onOpenRamSettings = {
+                                ProcessPhoenix.triggerRebirth(this@ErrorActivity)
+                            }
                         )
                     }
                 }

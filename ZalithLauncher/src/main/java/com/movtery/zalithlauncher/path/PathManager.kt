@@ -58,6 +58,9 @@ class PathManager {
         lateinit var DIR_CONTROL_LAYOUTS: File
         lateinit var DIR_TERRACOTTA: File
         lateinit var DIR_STYLES: File
+        lateinit var DIR_RENDERER_PLUGINS: File
+        lateinit var DIR_MODULAR_RENDERERS_INTERNAL: File
+        lateinit var DIR_INSTANCES: File
 
         lateinit var FILE_CRASH_REPORT: File
         lateinit var FILE_SETTINGS: File
@@ -102,6 +105,9 @@ class PathManager {
             DIR_CONTROL_LAYOUTS = File(DIR_FILES_EXTERNAL, "control_layouts")
             DIR_TERRACOTTA = File(DIR_FILES_PRIVATE, "net.burningtnt.terracotta")
             DIR_STYLES = File(DIR_FILES_PRIVATE, "special_styles")
+            DIR_RENDERER_PLUGINS = File(DIR_FILES_EXTERNAL, "plugins/renderers")
+            DIR_MODULAR_RENDERERS_INTERNAL = File(DIR_FILES_PRIVATE, "modular_renderers")
+            DIR_INSTANCES = File(DIR_FILES_EXTERNAL, "instances")
 
             FILE_CRASH_REPORT = File(DIR_LAUNCHER_LOGS, "launcher_crash.log")
             FILE_SETTINGS = File(DIR_FILES_PRIVATE, "settings.json")
@@ -120,7 +126,7 @@ class PathManager {
                 DIR_CACHE_GAME_DOWNLOADER, DIR_CACHE_MODPACK_DOWNLOADER, DIR_CACHE_MODPACK_EXPORTER,
                 DIR_CACHE_SAVE_EXPORTER, DIR_CACHE_MOD_UPDATER, DIR_CACHE_APP_ICON, DIR_CACHE_HOME_PAGE,
                 DIR_LAUNCHER_LOGS, DIR_NATIVE_LOGS, DIR_IMAGE_CACHE, DIR_CONTROL_LAYOUTS,
-                DIR_TERRACOTTA, DIR_STYLES
+                DIR_TERRACOTTA, DIR_STYLES, DIR_RENDERER_PLUGINS, DIR_MODULAR_RENDERERS_INTERNAL, DIR_INSTANCES
             ).forEach { dir ->
                 if (!dir.exists() && !dir.mkdirs()) {
                     Logger.warning(TAG, "Failed to create directory: ${dir.absolutePath}")

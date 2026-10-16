@@ -114,11 +114,27 @@ object AccountsManager {
     }
 
     /**
+     * Server autentikasi bawaan Ely.by (Skin & Auth)
+     */
+    val ELY_BY_SERVER = AuthServer(
+        baseUrl = "https://authlib-injector.ely.by/api/",
+        serverName = "Ely.by",
+        register = "https://ely.by/registration"
+    )
+
+    /**
      * 刷新当前已保存的认证服务器，认证服务器保存在数据库中
      */
     fun reloadAuthServers() {
         scope.launch {
-            val loadedServers = authServerDao.getAllServers()
+            var loadedServers = authServerDao.getAllServers()
+            // Pastikan Ely.by selalu terdaftar sebagai server autentikasi bawaan
+            if (loadedServers.none { it.baseUrl.contains("ely.by") || it.serverName.equals("Ely.by", ignoreCase = true) }) {
+                runCatching {
+                    authServerDao.saveServer(ELY_BY_SERVER)
+                    loadedServers = authServerDao.getAllServers()
+                }
+            }
             _authServers.clear()
             _authServers.addAll(loadedServers)
 

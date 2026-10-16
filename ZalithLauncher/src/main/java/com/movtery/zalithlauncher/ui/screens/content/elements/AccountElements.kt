@@ -484,6 +484,24 @@ fun LoginMenuDialog(
                                     onDismissRequest()
                                 }
                             )
+                            //Ely.by 登录
+                            LoginItem(
+                                modifier = Modifier.fillMaxWidth(),
+                                title = "Ely.by",
+                                onClick = {
+                                    val elyServer = authServers.find {
+                                        it.baseUrl.contains("ely.by") || it.serverName.equals("Ely.by", ignoreCase = true)
+                                    } ?: AccountsManager.ELY_BY_SERVER
+                                    onAuthServerLogin(elyServer)
+                                    onDismissRequest()
+                                }
+                            )
+                        }
+
+                        val customAuthServers = remember(authServers) {
+                            authServers.filterNot {
+                                it.baseUrl.contains("ely.by") || it.serverName.equals("Ely.by", ignoreCase = true)
+                            }
                         }
 
                         LazyColumn(
@@ -509,7 +527,7 @@ fun LoginMenuDialog(
                                 )
                             }
 
-                            items(authServers) { server ->
+                            items(customAuthServers) { server ->
                                 LoginItem(
                                     title = server.serverName,
                                     icon = {

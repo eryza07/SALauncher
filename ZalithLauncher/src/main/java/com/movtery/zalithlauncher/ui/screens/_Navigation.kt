@@ -25,6 +25,9 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavBackStack
@@ -118,20 +121,43 @@ fun rememberSwapTween(): FiniteAnimationSpec<Float> {
 }
 
 @Composable
-fun <T : Any> rememberTransitionSpec(): AnimatedContentTransitionScope<Scene<T>>.() -> ContentTransform {
+fun <T : Any> rememberTransitionSpec(isPop: Boolean = false): AnimatedContentTransitionScope<Scene<T>>.() -> ContentTransform {
     val type = AllSettings.launcherSwapAnimateType.state
     val speed = AllSettings.launcherAnimateSpeed.state
-    return remember(type, speed) {
-        val tween: FiniteAnimationSpec<Float> = when (type) {
+    return remember(type, speed, isPop) {
+        val duration = (getAnimateSpeed().coerceAtLeast(100) / 4) * 3
+        val floatTween: FiniteAnimationSpec<Float> = when (type) {
             TransitionAnimationType.CLOSE -> snap()
-            else -> tween(durationMillis = (getAnimateSpeed() / 5) * 2)
+            else -> tween(durationMillis = duration)
         }
+        val intOffsetTween = tween<IntOffset>(durationMillis = duration)
 
         {
-            ContentTransform(
-                fadeIn(animationSpec = tween),
-                fadeOut(animationSpec = tween),
-            )
+            if (type == TransitionAnimationType.CLOSE) {
+                ContentTransform(
+                    fadeIn(animationSpec = snap()),
+                    fadeOut(animationSpec = snap())
+                )
+            } else {
+                val slideTowards = if (isPop) {
+                    AnimatedContentTransitionScope.SlideDirection.End
+                } else {
+                    AnimatedContentTransitionScope.SlideDirection.Start
+                }
+                val enter = slideIntoContainer(
+                    towards = slideTowards,
+                    animationSpec = intOffsetTween,
+                    initialOffset = { it / 5 }
+                ) + fadeIn(animationSpec = floatTween) + scaleIn(initialScale = 0.94f, animationSpec = floatTween)
+
+                val exit = slideOutOfContainer(
+                    towards = slideTowards,
+                    animationSpec = intOffsetTween,
+                    targetOffset = { -it / 5 }
+                ) + fadeOut(animationSpec = floatTween) + scaleOut(targetScale = 0.94f, animationSpec = floatTween)
+
+                ContentTransform(enter, exit)
+            }
         }
     }
 }
