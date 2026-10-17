@@ -18,6 +18,8 @@
 
 package com.movtery.zalithlauncher.ui.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -36,16 +38,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -106,6 +111,11 @@ fun SimpleAlertDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
+        modifier = Modifier.border(2.5.dp, Color.Black, RoundedCornerShape(14.dp)),
+        shape = RoundedCornerShape(14.dp),
+        containerColor = Color.White,
+        titleContentColor = Color.Black,
+        textContentColor = Color.Black,
         onDismissRequest = {
             if (dismissByDialog) onDismiss()
         },
@@ -126,12 +136,18 @@ fun SimpleAlertDialog(
             }
         },
         confirmButton = {
-            Button(onClick = onConfirm) {
+            ScalingActionButton(onClick = onConfirm) {
                 MarqueeText(text = confirmText)
             }
         },
         dismissButton = {
-            FilledTonalButton(onClick = onDismiss) {
+            ScalingActionButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                )
+            ) {
                 MarqueeText(text = dismissText)
             }
         }
@@ -155,6 +171,11 @@ fun SimpleAlertDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
+        modifier = Modifier.border(2.5.dp, Color.Black, RoundedCornerShape(14.dp)),
+        shape = RoundedCornerShape(14.dp),
+        containerColor = Color.White,
+        titleContentColor = Color.Black,
+        textContentColor = Color.Black,
         onDismissRequest = {
             if (dismissByDialog) onDismiss()
         },
@@ -175,7 +196,7 @@ fun SimpleAlertDialog(
             }
         },
         confirmButton = {
-            Button(onClick = onDismiss) {
+            ScalingActionButton(onClick = onDismiss) {
                 MarqueeText(text = confirmText)
             }
         }
@@ -193,6 +214,11 @@ fun SimpleAlertDialog(
     onDismissRequest: () -> Unit = {}
 ) {
     AlertDialog(
+        modifier = Modifier.border(2.5.dp, Color.Black, RoundedCornerShape(14.dp)),
+        shape = RoundedCornerShape(14.dp),
+        containerColor = Color.White,
+        titleContentColor = Color.Black,
+        textContentColor = Color.Black,
         onDismissRequest = onDismissRequest,
         title = {
             Text(
@@ -211,12 +237,18 @@ fun SimpleAlertDialog(
             }
         },
         confirmButton = {
-            Button(onClick = onConfirm) {
+            ScalingActionButton(onClick = onConfirm) {
                 MarqueeText(text = confirmText)
             }
         },
         dismissButton = {
-            FilledTonalButton(onClick = onCancel) {
+            ScalingActionButton(
+                onClick = onCancel,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                )
+            ) {
                 MarqueeText(text = dismissText)
             }
         }
@@ -255,10 +287,11 @@ fun SimpleEditDialog(
                     .padding(all = 6.dp)
                     .heightIn(max = (maxHeight - 12.dp).coerceAtMost(rememberDialogMaxHeight()))
                     .wrapContentHeight(),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = cardColor(false),
-                contentColor = onCardColor(),
-                shadowElevation = 6.dp
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(2.5.dp, Color.Black),
+                color = Color.White,
+                contentColor = Color.Black,
+                shadowElevation = 0.dp
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -283,13 +316,17 @@ fun SimpleEditDialog(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        FilledTonalButton(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
-                            onClick = onCancel
+                            onClick = onCancel,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            )
                         ) {
                             MarqueeText(text = stringResource(R.string.generic_cancel))
                         }
-                        Button(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
                             onClick = onConfirm
                         ) {
@@ -332,10 +369,11 @@ fun SimpleEditDialog(
                     .padding(all = 6.dp)
                     .heightIn(max = (maxHeight - 12.dp).coerceAtMost(rememberDialogMaxHeight()))
                     .wrapContentHeight(),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = cardColor(false),
-                contentColor = onCardColor(),
-                shadowElevation = 6.dp
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(2.5.dp, Color.Black),
+                color = Color.White,
+                contentColor = Color.Black,
+                shadowElevation = 0.dp
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -356,7 +394,7 @@ fun SimpleEditDialog(
                         extraContent = extraContent
                     ).invoke(this)
 
-                    Button(
+                    ScalingActionButton(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = onConfirm
                     ) {
@@ -526,10 +564,11 @@ fun <T> SimpleListDialog(
                     .padding(all = 3.dp)
                     .heightIn(max = (maxHeight - 6.dp).coerceAtMost(rememberDialogMaxHeight()))
                     .wrapContentHeight(),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = cardColor(false),
-                contentColor = onCardColor(),
-                shadowElevation = 3.dp
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(2.5.dp, Color.Black),
+                color = Color.White,
+                contentColor = Color.Black,
+                shadowElevation = 0.dp
             ) {
                 Column(
                     modifier = Modifier
@@ -564,7 +603,7 @@ fun <T> SimpleListDialog(
                     Spacer(modifier = Modifier.size(4.dp))
 
                     if (showConfirm) {
-                        Button(
+                        ScalingActionButton(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
                                 if (selectedItem != null) {
@@ -624,10 +663,11 @@ fun ProgressDialog(
 ) {
     Dialog(onDismissRequest = {}) {
         Surface(
-            shape = MaterialTheme.shapes.extraLarge,
-            color = cardColor(false),
-            contentColor = onCardColor(),
-            shadowElevation = 6.dp
+            shape = RoundedCornerShape(14.dp),
+            border = BorderStroke(2.5.dp, Color.Black),
+            color = Color.White,
+            contentColor = Color.Black,
+            shadowElevation = 0.dp
         ) {
             Column(
                 modifier = Modifier

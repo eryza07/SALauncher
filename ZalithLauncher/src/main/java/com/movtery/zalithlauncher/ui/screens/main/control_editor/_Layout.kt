@@ -26,6 +26,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -493,15 +494,13 @@ fun InfoLayoutItem(
     onClick: () -> Unit,
     selected: Boolean = false,
     enabled: Boolean = true,
-    shape: Shape = MaterialTheme.shapes.large,
-    borderColor: Color = MaterialTheme.colorScheme.primary,
+    shape: Shape = RoundedCornerShape(10.dp),
+    borderColor: Color = if (selected) Color(0xFF2EE59D) else Color.Black,
     color: Color = itemColor(false),
     contentColor: Color = onItemColor(),
     content: @Composable RowScope.() -> Unit
 ) {
-    val borderWidth by animateDpAsState(
-        if (selected) 2.dp else (-1).dp
-    )
+    val borderWidth = if (selected) 2.5.dp else 1.5.dp
 
     Surface(
         modifier = modifier
@@ -519,7 +518,7 @@ fun InfoLayoutItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(shape = MaterialTheme.shapes.large)
+                .clip(shape = shape)
                 .padding(all = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),

@@ -20,6 +20,7 @@ package com.movtery.zalithlauncher.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -79,13 +80,13 @@ fun SimpleTextInputField(
     onValueChange: (String) -> Unit,
     hint: (@Composable () -> Unit)? = null,
     influencedByBackground: Boolean = true,
-    color: Color = cardColor(influencedByBackground),
-    contentColor: Color = onCardColor(),
-    shape: Shape = RoundedCornerShape(percent = 50),
+    color: Color = Color.White,
+    contentColor: Color = Color.Black,
+    shape: Shape = RoundedCornerShape(10.dp),
     blur: Int = AllSettings.backgroundBlur.state,
     contextPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     textStyle: TextStyle = TextStyle(color = contentColor).copy(fontSize = 12.sp),
-    cursorBrush: Brush = SolidColor(LocalTextSelectionColors.current.handleColor),
+    cursorBrush: Brush = SolidColor(Color.Black),
     singleLine: Boolean = false,
     imePanEnabled: Boolean = true,
 ) {
@@ -93,7 +94,8 @@ fun SimpleTextInputField(
         modifier = if (imePanEnabled) modifier.imePanAnchor() else modifier,
         color = color,
         contentColor = contentColor,
-        shape = shape
+        shape = shape,
+        border = BorderStroke(2.dp, Color.Black)
     ) {
         val focusManager = LocalFocusManager.current
 
@@ -149,9 +151,9 @@ fun SmallOutlinedEditField(
     trailingIcon: @Composable (() -> Unit)? = null,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     contentColor: Color? = null,
-    shape: Shape = OutlinedTextFieldDefaults.shape,
+    shape: Shape = RoundedCornerShape(10.dp),
     textStyle: TextStyle = TextStyle(fontSize = 12.sp),
-    cursorBrush: Brush = SolidColor(LocalTextSelectionColors.current.handleColor),
+    cursorBrush: Brush = SolidColor(Color.Black),
     keyboardOptions: KeyboardOptions? = null,
     keyboardActions: KeyboardActions? = null,
     singleLine: Boolean = false,
@@ -166,10 +168,10 @@ fun SmallOutlinedEditField(
     val effectiveTextStyle = textStyle.copy(color = effectiveContentColor)
 
     val borderWidth by animateDpAsState(
-        if (isFocused) 2.dp else 1.dp
+        if (isFocused) 2.5.dp else 2.dp
     )
     val borderColor by animateColorAsState(
-        if (isFocused) colors.focusedIndicatorColor else colors.unfocusedIndicatorColor
+        Color.Black
     )
     val labelScope = remember(labelPosition) {
         SimpleTextFieldLabelScope(

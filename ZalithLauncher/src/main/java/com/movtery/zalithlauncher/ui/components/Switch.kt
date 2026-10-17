@@ -42,7 +42,14 @@ fun DefaultSwitch(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: SwitchColors = SwitchDefaults.colors(),
+    colors: SwitchColors = SwitchDefaults.colors(
+        checkedThumbColor = Color.White,
+        checkedTrackColor = Color(0xFF2EE59D),
+        checkedBorderColor = Color.Black,
+        uncheckedThumbColor = Color.White,
+        uncheckedTrackColor = Color(0xFFE5E7EB),
+        uncheckedBorderColor = Color.Black,
+    ),
     interactionSource: MutableInteractionSource? = null
 ) {
     Switch(
@@ -64,7 +71,7 @@ fun DefaultSwitch(
                         if (it) R.drawable.ic_check else R.drawable.ic_close
                     ),
                     contentDescription = null,
-                    tint = colors.trackColor(enabled, checked)
+                    tint = Color.Black
                 )
             }
         },

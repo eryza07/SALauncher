@@ -27,13 +27,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
+import androidx.compose.ui.graphics.Color
+
 @Composable
 fun ContentCheckBox(
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: CheckboxColors = CheckboxDefaults.colors(),
+    colors: CheckboxColors = CheckboxDefaults.colors(
+        checkedColor = Color(0xFF2EE59D),
+        checkmarkColor = Color.Black,
+        uncheckedColor = Color.Black
+    ),
     interactionSource: MutableInteractionSource? = null,
     content: @Composable () -> Unit
 ) {

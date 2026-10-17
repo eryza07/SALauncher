@@ -157,12 +157,14 @@ fun NeobrutalDashboard(
                     // Left 2: Activity & Playtime Card
                     PlaytimeActivityCard()
 
-                    // Left 3: Current Active Version Box
-                    ActiveVersionOverviewCard(
-                        version = currentVersion,
-                        onDetailClick = toVersionSettingsScreen,
-                        onDownloadClick = toDownloadScreen
-                    )
+                    // Left 3: Current Active Version Box (only show if active version exists)
+                    if (currentVersion != null) {
+                        ActiveVersionOverviewCard(
+                            version = currentVersion,
+                            onDetailClick = toVersionSettingsScreen,
+                            onDownloadClick = toDownloadScreen
+                        )
+                    }
                 }
 
                 // RIGHT COLUMN (Hero Play Action, Fast Instances, Bottom Info)
@@ -264,16 +266,6 @@ private fun NeobrutalTopBar(
 
         Spacer(modifier = Modifier.width(10.dp))
 
-        // Battery & Network Pill
-        NeobrutalPillBadge(
-            text = "BAT: 88%  |  NET: OK",
-            backgroundColor = Color(0xFFE8F7F0),
-            textColor = Color.Black,
-            borderWidth = 2.dp
-        )
-
-        Spacer(modifier = Modifier.width(6.dp))
-
         // User Account Pill
         val accountName = currentAccount?.username
         NeobrutalPillButton(
@@ -364,7 +356,7 @@ private fun UserProfileCard(
 
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         NeobrutalPillBadge(
-                            text = if (hasCape) "Cape: Active" else "Cape: Off",
+                            text = if (hasCape) "Cape: ON" else "Cape: OFF",
                             backgroundColor = if (hasCape) Color(0xFFF0FDF4) else Color(0xFFF3F4F6),
                             textColor = if (hasCape) Color(0xFF166534) else Color(0xFF6B7280),
                             borderWidth = 1.5.dp

@@ -19,6 +19,7 @@
 package com.movtery.zalithlauncher.ui.components
 
 import androidx.annotation.IntRange
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,9 +45,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.movtery.zalithlauncher.R
@@ -119,6 +123,11 @@ fun SimpleTextSlider(
                 onValueChangeFinished = onValueChangeFinished,
                 valueRange = valueRange,
                 steps = steps,
+                colors = SliderDefaults.colors(
+                    thumbColor = Color.Black,
+                    activeTrackColor = Color(0xFFFFE600),
+                    inactiveTrackColor = Color(0xFFE5E7EB)
+                ),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -127,9 +136,10 @@ fun SimpleTextSlider(
                 .alpha(alpha = if (enabled) 1f else DisabledAlpha)
                 .padding(start = 12.dp)
                 .align(Alignment.CenterVertically),
-            shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
+            shape = RoundedCornerShape(6.dp),
+            color = Color(0xFFFFE600),
+            contentColor = Color.Black,
+            border = BorderStroke(1.5.dp, Color.Black)
         ) {
             Row(
                 modifier = Modifier.padding(PaddingValues(horizontal = 8.dp, vertical = 4.dp)),
@@ -145,10 +155,15 @@ fun SimpleTextSlider(
                 ) {
                     Text(
                         text = getTextString(value),
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold
                     )
                     suffix?.let { text ->
-                        Text(text = text)
+                        Text(
+                            text = text,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
                 if (fineTuningControl) {

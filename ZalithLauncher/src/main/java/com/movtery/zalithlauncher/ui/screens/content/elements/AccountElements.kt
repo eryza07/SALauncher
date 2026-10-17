@@ -31,7 +31,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.movtery.zalithlauncher.ui.components.ScalingActionButton
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -304,7 +306,8 @@ fun AccountItem(
         modifier = modifier.graphicsLayer(scaleY = scale.value, scaleX = scale.value),
         color = color,
         contentColor = contentColor,
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(2.dp, Color.Black),
         onClick = {
             if (selected || !enabled) return@Surface
             onSelected(account)
@@ -314,7 +317,7 @@ fun AccountItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(shape = MaterialTheme.shapes.large)
+                .clip(shape = RoundedCornerShape(10.dp))
                 .padding(all = 8.dp)
         ) {
             RadioButton(
@@ -445,10 +448,11 @@ fun LoginMenuDialog(
                     .padding(all = 6.dp)
                     .fillMaxWidth()
                     .heightIn(max = (maxHeight - 12.dp).coerceAtMost(rememberDialogMaxHeight())),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = cardColor(false),
-                contentColor = onCardColor(),
-                shadowElevation = 6.dp
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(2.5.dp, Color.Black),
+                color = Color.White,
+                contentColor = Color.Black,
+                shadowElevation = 0.dp
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth()
@@ -552,7 +556,7 @@ fun LoginMenuDialog(
                         }
                     }
 
-                    Button(
+                    ScalingActionButton(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp)
@@ -755,10 +759,11 @@ fun LocalLoginDialog(
                     .padding(all = 6.dp)
                     .heightIn(max = (maxHeight - 12.dp).coerceAtMost(rememberDialogMaxHeight()))
                     .wrapContentHeight(),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = cardColor(false),
-                contentColor = onCardColor(),
-                shadowElevation = 6.dp
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(2.5.dp, Color.Black),
+                color = Color.White,
+                contentColor = Color.Black,
+                shadowElevation = 0.dp
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -919,13 +924,17 @@ fun LocalLoginDialog(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        FilledTonalButton(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
-                            onClick = onDismissRequest
+                            onClick = onDismissRequest,
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            )
                         ) {
                             MarqueeText(text = stringResource(R.string.generic_cancel))
                         }
-                        Button(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
                             onClick = {
                                 if (userName.isNotEmpty()) {
@@ -985,10 +994,11 @@ fun OtherServerLoginDialog(
                     .padding(all = 6.dp)
                     .heightIn(max = (maxHeight - 12.dp).coerceAtMost(rememberDialogMaxHeight()))
                     .wrapContentHeight(),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = cardColor(false),
-                contentColor = onCardColor(),
-                shadowElevation = 6.dp
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(2.5.dp, Color.Black),
+                color = Color.White,
+                contentColor = Color.Black,
+                shadowElevation = 0.dp
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -1125,13 +1135,17 @@ fun OtherServerLoginDialog(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        FilledTonalButton(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
-                            onClick = onDismissRequest
+                            onClick = onDismissRequest,
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            )
                         ) {
                             MarqueeText(text = stringResource(R.string.generic_cancel))
                         }
-                        Button(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
                             onClick = confirmAction
                         ) {
@@ -1187,10 +1201,11 @@ fun OtherAccountReloginDialog(
                     .padding(all = 6.dp)
                     .heightIn(max = (maxHeight - 12.dp).coerceAtMost(rememberDialogMaxHeight()))
                     .wrapContentHeight(),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = cardColor(false),
-                contentColor = onCardColor(),
-                shadowElevation = 6.dp
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(2.5.dp, Color.Black),
+                color = Color.White,
+                contentColor = Color.Black,
+                shadowElevation = 0.dp
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -1266,14 +1281,18 @@ fun OtherAccountReloginDialog(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        FilledTonalButton(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
                             enabled = !logging,
-                            onClick = onDismissRequest
+                            onClick = onDismissRequest,
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            )
                         ) {
                             MarqueeText(text = stringResource(R.string.generic_cancel))
                         }
-                        Button(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
                             enabled = !logging && password.isNotEmpty(),
                             onClick = { onConfirm(password) }
@@ -1417,10 +1436,11 @@ fun ChangeSkinDialog(
                     .padding(all = 6.dp)
                     .heightIn(min = (maxHeight * 0.85f).coerceAtMost(rememberDialogMaxHeight()))
                     .heightIn(max = (maxHeight - 12.dp).coerceAtMost(rememberDialogMaxHeight())),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = cardColor(false),
-                contentColor = onCardColor(),
-                shadowElevation = 6.dp
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(2.5.dp, Color.Black),
+                color = Color.White,
+                contentColor = Color.Black,
+                shadowElevation = 0.dp
             ) {
                 Column(
                     modifier = Modifier
@@ -1635,14 +1655,18 @@ fun ChangeSkinDialog(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        FilledTonalButton(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
-                            onClick = onDismissRequest
+                            onClick = onDismissRequest,
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            )
                         ) {
                             Text(text = stringResource(R.string.generic_cancel))
                         }
 
-                        Button(
+                        ScalingActionButton(
                             modifier = Modifier.weight(1f),
                             enabled = skinState != ChangeSkin.None || capeState != ChangeCape.None,
                             onClick = {

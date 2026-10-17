@@ -72,6 +72,9 @@ fun RadioCard(
     }
 }
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+
 @Composable
 fun RadioCard(
     selected: Boolean,
@@ -80,8 +83,11 @@ fun RadioCard(
     enabled: Boolean = true,
     color: Color = itemColor(false),
     contentColor: Color = onItemColor(),
-    shape: Shape = MaterialTheme.shapes.large,
-    radioColors: RadioButtonColors = RadioButtonDefaults.colors(),
+    shape: Shape = RoundedCornerShape(10.dp),
+    radioColors: RadioButtonColors = RadioButtonDefaults.colors(
+        selectedColor = Color.Black,
+        unselectedColor = Color.Black
+    ),
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -127,6 +133,7 @@ private fun InternalSurface(
             color = color,
             contentColor = contentColor,
             shape = shape,
+            border = BorderStroke(1.5.dp, Color.Black),
             onClick = onClick,
             enabled = enabled,
             interactionSource = interactionSource,
@@ -138,6 +145,7 @@ private fun InternalSurface(
             color = color,
             contentColor = contentColor,
             shape = shape,
+            border = BorderStroke(1.5.dp, Color.Black),
             content = content
         )
     }

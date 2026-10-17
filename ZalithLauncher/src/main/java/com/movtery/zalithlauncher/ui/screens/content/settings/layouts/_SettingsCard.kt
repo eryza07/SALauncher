@@ -148,13 +148,16 @@ enum class CardPosition {
     Single
 }
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
+
 /**
- * 根据 UI 组件在组中的位置决定的形状
+ * 根据 UI 组件在组中的位置决定的形状 (Softened Brutalism 12dp)
  */
 @Composable
 fun rememberSettingsCardShape(
     position: CardPosition,
-    outerShape: Dp = 28.dp,
+    outerShape: Dp = 12.dp,
     innerShape: Dp = 4.dp
 ): Shape {
     return remember(position, outerShape, innerShape) {
@@ -205,7 +208,7 @@ fun rememberSettingsCardShape(
 fun SettingsCard(
     modifier: Modifier = Modifier,
     position: CardPosition,
-    outerShape: Dp = 28.dp,
+    outerShape: Dp = 12.dp,
     innerShape: Dp = 4.dp,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -214,6 +217,7 @@ fun SettingsCard(
     BackgroundCard(
         modifier = modifier,
         shape = shape,
+        border = BorderStroke(2.dp, Color.Black),
         content = content
     )
 }
@@ -222,7 +226,7 @@ fun SettingsCard(
 fun SettingsCard(
     modifier: Modifier = Modifier,
     position: CardPosition,
-    outerShape: Dp = 28.dp,
+    outerShape: Dp = 12.dp,
     innerShape: Dp = 4.dp,
     onClick: () -> Unit,
     enabled: Boolean = true,
@@ -233,6 +237,7 @@ fun SettingsCard(
     BackgroundCard(
         modifier = modifier,
         shape = shape,
+        border = BorderStroke(2.dp, Color.Black),
         onClick = onClick,
         enabled = enabled,
         content = content
@@ -247,7 +252,7 @@ fun SettingsCard(
     summary: String? = null,
     titleStyle: TextStyle = MaterialTheme.typography.titleSmall,
     summaryStyle: TextStyle = MaterialTheme.typography.labelSmall,
-    outerShape: Dp = 28.dp,
+    outerShape: Dp = 12.dp,
     innerShape: Dp = 4.dp,
     innerPadding: PaddingValues = PaddingValues(all = 16.dp),
     onClick: () -> Unit,
@@ -259,6 +264,7 @@ fun SettingsCard(
     BackgroundCard(
         modifier = modifier,
         shape = shape,
+        border = BorderStroke(2.dp, Color.Black),
         onClick = onClick,
         enabled = enabled
     ) {
@@ -292,7 +298,7 @@ fun SettingsCardColumn(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
         content = content
     )
 }

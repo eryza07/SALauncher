@@ -36,6 +36,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +44,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
@@ -197,9 +200,9 @@ private fun TabMenu(
                 HorizontalDivider(
                     modifier = Modifier
                         .padding(vertical = 12.dp)
-                        .fillMaxWidth(0.4f)
-                        .alpha(0.4f),
-                    color = MaterialTheme.colorScheme.onSurface
+                        .fillMaxWidth(0.6f),
+                    thickness = 2.dp,
+                    color = Color.Black
                 )
             }
 
@@ -216,9 +219,17 @@ private fun TabMenu(
                         modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
                         text = stringResource(item.textRes),
                         maxLines = 1,
+                        fontWeight = if (backScreenViewModel.downloadScreen.currentKey == item.key) FontWeight.Black else FontWeight.Bold,
                         style = MaterialTheme.typography.labelMedium
                     )
-                }
+                },
+                colors = NavigationRailItemDefaults.colors(
+                    selectedIconColor = Color.Black,
+                    selectedTextColor = Color.Black,
+                    indicatorColor = Color(0xFFFFE600),
+                    unselectedIconColor = Color(0xFF4B5563),
+                    unselectedTextColor = Color(0xFF4B5563)
+                )
             )
 
             Spacer(modifier = Modifier.height(8.dp))

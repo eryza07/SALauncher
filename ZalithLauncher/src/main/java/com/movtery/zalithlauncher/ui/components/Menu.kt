@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
@@ -123,7 +124,7 @@ enum class MenuState {
 fun MenuSubscreen(
     state: MenuState,
     closeScreen: () -> Unit,
-    shape: Shape = RoundedCornerShape(21.0.dp),
+    shape: Shape = RoundedCornerShape(12.dp),
     backgroundColor: Color = Color.Black.copy(alpha = 0.25f),
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -183,7 +184,7 @@ fun MenuSubscreen(
 fun DualMenuSubscreen(
     state: MenuState,
     closeScreen: () -> Unit,
-    shape: Shape = RoundedCornerShape(21.0.dp),
+    shape: Shape = RoundedCornerShape(12.dp),
     backgroundColor: Color = Color.Black.copy(alpha = 0.25f),
     titleHeight: Dp = 48.dp,
     leftMenuTitle: (@Composable BoxScope.() -> Unit)? = null,
@@ -307,7 +308,7 @@ private fun MenuTitleLayout(
             content = titleLayout
         )
     }
-    HorizontalDivider(modifier = Modifier.fillMaxWidth())
+    HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp, color = Color.Black)
 }
 
 @Composable
@@ -719,9 +720,10 @@ fun MenuButtonLayout(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     influencedByBackground: Boolean = false,
-    shape: Shape = MaterialTheme.shapes.large,
+    shape: Shape = RoundedCornerShape(10.dp),
     color: Color = itemColor(influencedByBackground),
     contentColor: Color = onItemColor(),
+    border: BorderStroke? = BorderStroke(1.5.dp, Color.Black),
     blur: Int = AllSettings.backgroundBlur.state,
     onClick: () -> Unit = {},
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
@@ -738,6 +740,7 @@ fun MenuButtonLayout(
         shape = shape,
         color = color,
         contentColor = contentColor,
+        border = border,
         enabled = enabled,
         onClick = onClick
     ) {

@@ -39,6 +39,8 @@ import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.cardTitleColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor
 
+import androidx.compose.ui.unit.dp
+
 /**
  * 背景卡片组件，
  * 使用方式与原本的[Card]无异，但[BackgroundCard]配置了更舒适的背景颜色
@@ -52,17 +54,17 @@ fun BackgroundCard(
         containerColor = cardColor(influencedByBackground),
         contentColor = onCardColor()
     ),
-    elevation: CardElevation = CardDefaults.cardElevation(),
+    elevation: CardElevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     blur: Int = AllSettings.backgroundBlur.state,
-    border: BorderStroke? = null,
+    border: BorderStroke? = BorderStroke(2.dp, Color.Black),
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
         modifier = modifier,
         shape = shape,
         colors = colors,
-        elevation = elevation,
-        border = border,
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = border ?: BorderStroke(2.dp, Color.Black),
     ) {
         Column(
             modifier = Modifier.backgroundGlass(blur, colors.containerColor, influencedByBackground),
@@ -85,9 +87,9 @@ fun BackgroundCard(
         contentColor = onCardColor(),
         disabledContainerColor = cardColor(influencedByBackground)
     ),
-    elevation: CardElevation = CardDefaults.cardElevation(),
+    elevation: CardElevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     blur: Int = AllSettings.backgroundBlur.state,
-    border: BorderStroke? = null,
+    border: BorderStroke? = BorderStroke(2.dp, Color.Black),
     onClick: () -> Unit,
     enabled: Boolean = true,
     content: @Composable @UiComposable ColumnScope.() -> Unit
@@ -96,8 +98,8 @@ fun BackgroundCard(
         modifier = modifier,
         shape = shape,
         colors = colors,
-        elevation = elevation,
-        border = border,
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = border ?: BorderStroke(2.dp, Color.Black),
         onClick = onClick,
         enabled = enabled,
     ) {
@@ -138,6 +140,6 @@ fun CardTitleLayout(
                 content = content
             )
         }
-        HorizontalDivider(modifier = Modifier.fillMaxWidth())
+        HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp, color = Color.Black)
     }
 }

@@ -39,6 +39,9 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import com.movtery.zalithlauncher.R
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+
 /**
  * A composable that displays a checkable chip, visually similar to a [FilterChip].
  * It allows for a selection state to be toggled.
@@ -50,10 +53,10 @@ fun CheckChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    shape: Shape = FilterChipDefaults.shape,
+    shape: Shape = RoundedCornerShape(8.dp),
     colors: SelectableChipColors = FilterChipDefaults.filterChipColors(),
-    elevation: SelectableChipElevation? = FilterChipDefaults.filterChipElevation(),
-    border: BorderStroke? = FilterChipDefaults.filterChipBorder(enabled, selected),
+    elevation: SelectableChipElevation? = null,
+    border: BorderStroke? = BorderStroke(1.5.dp, Color.Black),
     interactionSource: MutableInteractionSource? = null
 ) {
     FilterChip(

@@ -18,9 +18,14 @@
 
 package com.movtery.zalithlauncher.ui.components
 
+import android.view.HapticFeedbackConstants
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -31,9 +36,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -54,6 +61,7 @@ import androidx.compose.material3.TooltipScope
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -67,12 +75,15 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.movtery.zalithlauncher.ui.screens.content.elements.DisabledAlpha
 import kotlinx.coroutines.launch
@@ -82,32 +93,40 @@ fun ScalingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    shape: Shape = ButtonDefaults.shape,
-    colors: ButtonColors = ButtonDefaults.buttonColors(),
-    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(),
-    border: BorderStroke? = null,
+    shape: Shape = RoundedCornerShape(10.dp),
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = Color(0xFFFFE600),
+        contentColor = Color.Black
+    ),
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+    border: BorderStroke? = BorderStroke(2.dp, Color.Black),
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    val scale = animateFloatAsState(
-        targetValue = if (isPressed) 0.95f else 1f,
-        animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
-        label = "ButtonScale"
+    val view = LocalView.current
+
+    LaunchedEffect(isPressed) {
+        if (isPressed) {
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        }
+    }
+
+    val pressOffset by animateDpAsState(
+        targetValue = if (isPressed) 2.dp else 0.dp,
+        animationSpec = tween(durationMillis = 60),
+        label = "ButtonPressOffset"
     )
 
     Button(
         onClick = onClick,
-        modifier = modifier.graphicsLayer {
-            scaleX = scale.value
-            scaleY = scale.value
-        },
+        modifier = modifier.offset { IntOffset(pressOffset.roundToPx(), pressOffset.roundToPx()) },
         enabled = enabled,
         shape = shape,
         colors = colors,
-        elevation = elevation,
-        border = border,
+        elevation = null,
+        border = border ?: BorderStroke(2.dp, Color.Black),
         contentPadding = contentPadding,
         interactionSource = interactionSource,
         content = content
@@ -198,20 +217,38 @@ fun IconTextButton(
 fun BaseIconTextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    shape: Shape = MaterialTheme.shapes.large,
+    shape: Shape = RoundedCornerShape(8.dp),
     icon: @Composable (Modifier) -> Unit,
     text: String,
     style: TextStyle = MaterialTheme.typography.labelMedium,
     enabled: Boolean = true,
     onLongClick: () -> Unit = {},
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val pressOffset by animateDpAsState(
+        targetValue = if (isPressed) 1.5.dp else 0.dp,
+        animationSpec = tween(60),
+        label = "IconTextButtonPress"
+    )
+
     Row(
         modifier = modifier
+            .offset { IntOffset(pressOffset.roundToPx(), pressOffset.roundToPx()) }
+            .background(Color.White, shape = shape)
+            .border(1.5.dp, Color.Black, shape = shape)
             .clip(shape = shape)
-            .combinedClickable(enabled = enabled, onClick = onClick, onLongClick = onLongClick)
-            .padding(PaddingValues(horizontal = 8.dp, vertical = 4.dp))
+            .combinedClickable(
+                enabled = enabled,
+                onClick = onClick,
+                onLongClick = onLongClick,
+                interactionSource = interactionSource,
+                indication = null
+            )
+            .padding(PaddingValues(horizontal = 10.dp, vertical = 6.dp))
             .alpha(if (enabled) 1f else DisabledAlpha),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         icon(Modifier.align(Alignment.CenterVertically))
         Text(
@@ -219,7 +256,9 @@ fun BaseIconTextButton(
                 .align(Alignment.CenterVertically)
                 .padding(end = 4.dp),
             text = text,
-            style = style
+            style = style,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
         )
     }
 }
