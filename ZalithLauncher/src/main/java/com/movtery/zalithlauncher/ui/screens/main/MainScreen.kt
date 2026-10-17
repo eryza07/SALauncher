@@ -332,6 +332,16 @@ private fun NavigationUI(
             )
         }
 
+        val openFileManager: () -> Unit = {
+            screenBackStackModel.mainScreen.navigateTo(NormalNavKey.FileManager)
+        }
+        val toDownloadScreen: () -> Unit = {
+            screenBackStackModel.navigateToDownload()
+        }
+        val toDownloadModScreen: () -> Unit = {
+            screenBackStackModel.navigateToDownload(screenBackStackModel.downloadModScreen)
+        }
+
         NavDisplay(
             backStack = backStack,
             modifier = modifier,
