@@ -548,9 +548,11 @@ private fun StatSubBox(
 @Composable
 private fun ActiveVersionOverviewCard(
     version: Version?,
-    onDetailClick: () -> Unit
+    onDetailClick: () -> Unit,
+    onDownloadClick: () -> Unit = onDetailClick
 ) {
     val hasVersion = version != null
+    val targetClick = if (hasVersion) onDetailClick else onDownloadClick
     val versionName = if (hasVersion) version!!.getVersionName() else "BELUM ADA VERSI"
     val subtitle = if (hasVersion) "MobileGL v2.4 • Vulkan Pipe" else "Unduh Minecraft dari menu DOWNLOAD"
 
@@ -606,7 +608,7 @@ private fun ActiveVersionOverviewCard(
             }
 
             NeobrutalButton(
-                onClick = onDetailClick,
+                onClick = targetClick,
                 backgroundColor = if (hasVersion) NeobrutalTokens.AccentSecondary else NeobrutalTokens.AccentPrimary,
                 shadowOffset = 2.5.dp,
                 cornerRadius = 8.dp
@@ -629,9 +631,11 @@ private fun ActiveVersionOverviewCard(
 @Composable
 private fun HeroPlayCard(
     version: Version?,
-    onPlayClick: () -> Unit
+    onPlayClick: () -> Unit,
+    onDownloadClick: () -> Unit = onPlayClick
 ) {
     val hasVersion = version != null
+    val targetClick = if (hasVersion) onPlayClick else onDownloadClick
     val versionName = if (hasVersion) version!!.getVersionName().uppercase() else "BELUM ADA VERSI"
     val actionText = if (hasVersion) "▶ MAINKAN" else "▶ UNDUH MINECRAFT"
     val statusText = if (hasVersion) "READY TO LAUNCH" else "STATUS: BELUM ADA VERSI"
@@ -663,7 +667,7 @@ private fun HeroPlayCard(
                 // Massive Hero CTA Button Text
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { onPlayClick() }
+                    modifier = Modifier.clickable { targetClick() }
                 ) {
                     Text(
                         text = actionText,
@@ -698,7 +702,7 @@ private fun HeroPlayCard(
                 modifier = Modifier
                     .size(52.dp)
                     .background(Color.Black, RoundedCornerShape(14.dp))
-                    .clickable { onPlayClick() },
+                    .clickable { targetClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
