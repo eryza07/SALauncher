@@ -62,8 +62,8 @@ fun UniversalNeobrutalTopBar(
 ) {
     val isBeranda = currentKey == null || currentKey is NormalNavKey.LauncherMain
     val isDownload = currentKey is NestedNavKey.Download
-    val isMods = currentKey is NestedNavKey.VersionSettings
-    val isFileManager = currentKey is NormalNavKey.FileSelector
+    val isMods = currentKey is NestedNavKey.VersionSettings || currentKey is NormalNavKey.Mods
+    val isFileManager = currentKey is NormalNavKey.FileSelector || currentKey is NormalNavKey.FileManager
     val isSettings = currentKey is NestedNavKey.Settings
 
     Row(
@@ -232,8 +232,8 @@ fun NeobrutalSubHeader(
         is NestedNavKey.Download -> "DOWNLOAD & INSTALASI" to "Unduh versi Vanilla, Fabric, Forge, dan Quilt"
         is NormalNavKey.VersionsManager -> "PROFIL INSTANCE" to "Kelola versi Minecraft dan modpack terpasang"
         is NormalNavKey.AccountManager -> "PROFIL AKUN" to "Kelola akun Minecraft (Microsoft & Offline)"
-        is NestedNavKey.VersionSettings -> "MODS & LOADER" to "Kelola modifikasi, loader, dan konfigurasi instance"
-        is NormalNavKey.FileSelector -> "FILE MANAGER" to "Akses langsung ke direktori file dan dokumen game"
+        is NestedNavKey.VersionSettings, is NormalNavKey.Mods -> "MODS & LOADER" to "Kelola Fabric/Forge loader, pasang mod, dan atur resource pack"
+        is NormalNavKey.FileSelector, is NormalNavKey.FileManager -> "FILE MANAGER" to "Akses langsung ke direktori file dan dokumen game"
         is NormalNavKey.Multiplayer -> "MULTIPLAYER & LAN" to "Terracotta P2P Online Multiplayer"
         is NormalNavKey.License -> "LISENSI & HUKUM" to "Lisensi Open Source dan Informasi Hak Cipta"
         is NestedNavKey.VersionExport -> "EKSPOR PROFIL" to "Ekspor instance menjadi paket modpack .mrpack / .zip"
@@ -412,7 +412,7 @@ fun NeobrutalSubHeader(
                         }
                     }
                 }
-                is NestedNavKey.VersionSettings -> {
+                is NestedNavKey.VersionSettings, is NormalNavKey.Mods -> {
                     if (onImportJar != null) {
                         NeobrutalButton(
                             onClick = onImportJar,
@@ -446,7 +446,7 @@ fun NeobrutalSubHeader(
                         }
                     }
                 }
-                is NormalNavKey.FileSelector -> {
+                is NormalNavKey.FileSelector, is NormalNavKey.FileManager -> {
                     if (onImportFile != null) {
                         NeobrutalButton(
                             onClick = onImportFile,

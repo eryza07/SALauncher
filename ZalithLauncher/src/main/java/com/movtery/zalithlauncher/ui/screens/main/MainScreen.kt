@@ -109,6 +109,12 @@ import com.movtery.zalithlauncher.ui.screens.content.navigateToDownload
 import com.movtery.zalithlauncher.ui.screens.navigateTo
 import com.movtery.zalithlauncher.ui.screens.onBack
 import com.movtery.zalithlauncher.ui.screens.rememberTransitionSpec
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalAccountsScreen
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalDownloadScreen
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalFileManagerScreen
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalInstancesScreen
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalModsScreen
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalSettingsScreen
 import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalDottedCanvas
 import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalSubHeader
 import com.movtery.zalithlauncher.ui.theme.neobrutal.UniversalNeobrutalTopBar
@@ -192,22 +198,11 @@ fun MainScreen(
     }
 
     val toModsScreen: () -> Unit = {
-        VersionsManager.currentVersion.value?.let { version ->
-            screenBackStackModel.mainScreen.navigateTo(
-                screenKey = NestedNavKey.VersionSettings(version),
-                useClassEquality = true
-            )
-        } ?: run {
-            screenBackStackModel.navigateToDownload(screenBackStackModel.downloadModScreen)
-        }
+        screenBackStackModel.mainScreen.navigateTo(NormalNavKey.Mods)
     }
 
     val openFileManager: () -> Unit = {
-        eventViewModel.sendEvent(
-            EventViewModel.Event.OpenFileManager(
-                rootPath = PathManager.DIR_FILES_EXTERNAL.absolutePath
-            )
-        )
+        screenBackStackModel.mainScreen.navigateTo(NormalNavKey.FileManager)
     }
 
     NeobrutalDottedCanvas(
@@ -374,15 +369,14 @@ private fun NavigationUI(
                         }
                     )
                 }
-                entry<NestedNavKey.Settings> { key ->
-                    SettingsScreen(
-                        key = key,
-                        backStackViewModel = screenBackStackModel,
-                        openLicenseScreen = { raw ->
-                            backStack.navigateTo(NormalNavKey.License(raw))
+                entry<NestedNavKey.Settings> { _ ->
+                    NeobrutalSettingsScreen(
+                        onManageRuntimes = {
+                            screenBackStackModel.mainScreen.navigateTo(NormalNavKey.Settings.JavaManager)
                         },
-                        eventViewModel = eventViewModel,
-                        submitError = submitError
+                        onInstallPlugin = openFileManager,
+                        onResetSettings = {},
+                        onSaveSettings = {}
                     )
                 }
                 entry<NormalNavKey.License> { key ->
@@ -391,16 +385,14 @@ private fun NavigationUI(
                         backStackViewModel = screenBackStackModel
                     )
                 }
-                entry<NormalNavKey.AccountManager> { key ->
-                    AccountManageScreen(
-                        key = key,
-                        backStackViewModel = screenBackStackModel,
-                        backToMainScreen = toMainScreen,
-                        openLink = { url ->
-                            eventViewModel.sendEvent(EventViewModel.Event.OpenLink(url))
+                entry<NormalNavKey.AccountManager> { _ ->
+                    NeobrutalAccountsScreen(
+                        onMicrosoftLogin = {
+                            screenBackStackModel.mainScreen.navigateTo(
+                                screenKey = NormalNavKey.AccountManager(FirstLoginMenu.MICROSOFT)
+                            )
                         },
-                        eventViewModel = eventViewModel,
-                        submitError = submitError
+                        onUploadSkin = openFileManager
                     )
                 }
                 entry<NormalNavKey.WebScreen> { key ->
@@ -411,12 +403,14 @@ private fun NavigationUI(
                     )
                 }
                 entry<NormalNavKey.VersionsManager> {
-                    VersionsManageScreen(
-                        backScreenViewModel = screenBackStackModel,
-                        navigateToVersions = navigateToVersions,
-                        navigateToExport = navigateToExport,
-                        eventViewModel = eventViewModel,
-                        submitError = submitError
+                    NeobrutalInstancesScreen(
+                        onCreateInstance = toDownloadScreen,
+                        onImportMrpack = openFileManager,
+                        onExportInstance = { version -> navigateToExport(version) },
+                        onDuplicateInstance = {},
+                        onDeleteInstance = { version ->
+                            VersionsManager.deleteVersion(version)
+                        }
                     )
                 }
                 entry<NormalNavKey.FileSelector> { key ->
@@ -428,16 +422,23 @@ private fun NavigationUI(
                     }
                 }
                 entry<NestedNavKey.VersionSettings> { key ->
-                    VersionSettingsScreen(
-                        key = key,
-                        modifyViewModel = modifyVersionViewModel,
-                        backScreenViewModel = screenBackStackModel,
-                        backToMainScreen = toMainScreen,
-                        onExportModpack = {
-                            navigateToExport(key.version)
-                        },
-                        eventViewModel = eventViewModel,
-                        submitError = submitError
+                    NeobrutalModsScreen(
+                        currentVersion = key.version,
+                        onInstallModFile = openFileManager,
+                        onExploreModsOnline = toDownloadModScreen
+                    )
+                }
+                entry<NormalNavKey.Mods> {
+                    NeobrutalModsScreen(
+                        currentVersion = VersionsManager.currentVersion.value,
+                        onInstallModFile = openFileManager,
+                        onExploreModsOnline = toDownloadModScreen
+                    )
+                }
+                entry<NormalNavKey.FileManager> {
+                    NeobrutalFileManagerScreen(
+                        onImportFile = openFileManager,
+                        onCreateFolder = {}
                     )
                 }
                 entry<NestedNavKey.VersionExport> { key ->
@@ -448,13 +449,11 @@ private fun NavigationUI(
                         backToMainScreen = toMainScreen
                     )
                 }
-                entry<NestedNavKey.Download> { key ->
-                    DownloadScreen(
-                        key = key,
-                        backScreenViewModel = screenBackStackModel,
-                        eventViewModel = eventViewModel,
-                        modpackImportViewModel = modpackImportViewModel,
-                        submitError = submitError
+                entry<NestedNavKey.Download> { _ ->
+                    NeobrutalDownloadScreen(
+                        onStartDownload = { _ ->
+                            // download
+                        }
                     )
                 }
                 entry<NestedNavKey.AssetInfo> { key ->

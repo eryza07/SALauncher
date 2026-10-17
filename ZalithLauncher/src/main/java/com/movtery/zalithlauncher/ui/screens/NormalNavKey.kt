@@ -71,6 +71,16 @@ sealed interface NormalNavKey : TitledNavKey {
         @Contextual override val title: AndroidStringText = androidText(R.string.versions_overview_log)
     }
 
+    /** Neobrutal Mods 屏幕 */
+    @Serializable data object Mods : NormalNavKey {
+        @Contextual override val title: AndroidStringText = androidText(R.string.mods_manage)
+    }
+
+    /** Neobrutal 文件管理屏幕 */
+    @Serializable data object FileManager : NormalNavKey {
+        @Contextual override val title: AndroidStringText = androidText(R.string.page_title_select_files)
+    }
+
     /** 设置嵌套子屏幕 */
     sealed interface Settings : NormalNavKey {
         /** 渲染器设置屏幕 */
