@@ -82,7 +82,8 @@ object GpuDetector {
         return CompatibilityResult.Compatible
     }
 
-    private synchronized fun detectGpuInfo() {
+    @Synchronized
+    private fun detectGpuInfo() {
         if (cachedGpuRenderer != null && cachedGpuVendor != null) return
 
         runCatching {

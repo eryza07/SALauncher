@@ -80,7 +80,7 @@ class ModularRendererPlugin(
     companion object {
         fun syncExecutableLibrary(source: File, destination: File) {
             runCatching {
-                if (!destination.parentFile.exists()) destination.parentFile.mkdirs()
+                destination.parentFile?.let { if (!it.exists()) it.mkdirs() }
                 if (!destination.exists() || destination.length() != source.length() || destination.lastModified() < source.lastModified()) {
                     FileUtils.copyFile(source, destination)
                     destination.setReadable(true, false)
@@ -184,7 +184,8 @@ object ModularRendererPluginManager {
                 }
             }
 
-            val uniqueId = "modular_renderer_${soFile.parentFile.name}_${soFile.nameWithoutExtension}"
+            val parentName = soFile.parentFile?.name ?: "root"
+            val uniqueId = "modular_renderer_${parentName}_${soFile.nameWithoutExtension}"
 
             ModularRendererPlugin(
                 id = rendererId,
