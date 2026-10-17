@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import com.movtery.zalithlauncher.ui.resolveAndroidString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -237,7 +238,7 @@ fun NeobrutalSubHeader(
         is NormalNavKey.License -> "LISENSI & HUKUM" to "Lisensi Open Source dan Informasi Hak Cipta"
         is NestedNavKey.VersionExport -> "EKSPOR PROFIL" to "Ekspor instance menjadi paket modpack .mrpack / .zip"
         else -> {
-            val resTitle = currentKey?.title?.let { stringResource(it) } ?: "ZALITH LAUNCHER"
+            val resTitle = currentKey?.title?.let { resolveAndroidString(it).text } ?: "ZALITH LAUNCHER"
             resTitle.uppercase() to "Navigasi sistem Zalith-OE"
         }
     }
