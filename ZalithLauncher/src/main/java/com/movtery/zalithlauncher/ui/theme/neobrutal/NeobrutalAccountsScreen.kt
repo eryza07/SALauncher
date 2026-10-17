@@ -161,7 +161,7 @@ fun NeobrutalAccountsScreen(
                             .background(if (isCur) Color(0xFFFFFBEB) else Color.White, RoundedCornerShape(6.dp))
                             .border(1.5.dp, Color.Black, RoundedCornerShape(6.dp))
                             .clickable {
-                                AccountsManager.saveCurrentAccount(acc)
+                                AccountsManager.setCurrentAccount(acc)
                                 showSwitchAccountDialog = false
                             }
                             .padding(8.dp)
@@ -289,7 +289,7 @@ fun NeobrutalAccountsScreen(
 
                     NeobrutalButton(
                         onClick = {
-                            currentAccount?.let { AccountsManager.removeAccount(it) }
+                            currentAccount?.let { AccountsManager.deleteAccount(it) }
                         },
                         modifier = Modifier.weight(1f),
                         backgroundColor = Color(0xFFFFF1F2),
