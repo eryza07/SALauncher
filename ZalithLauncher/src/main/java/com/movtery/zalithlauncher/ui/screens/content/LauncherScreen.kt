@@ -179,14 +179,6 @@ fun LauncherScreen(
                 )
             }
 
-            // Jika pertama kali buka aplikasi dan belum ada akun, pandu langsung ke menu login (Microsoft / Offline / Ely.by)
-            LaunchedEffect(accounts) {
-                if (accounts.isEmpty() && !hasAutoPromptedLogin) {
-                    hasAutoPromptedLogin = true
-                    toAccountManageScreen()
-                }
-            }
-
             val toVersionManageScreen: () -> Unit = {
                 backStackViewModel.mainScreen.removeAndNavigateTo(
                     remove = NestedNavKey.VersionSettings::class,
@@ -198,6 +190,12 @@ fun LauncherScreen(
                     navigateToVersions(version)
                 }
             }
+            val toDownloadGameScreen: () -> Unit = {
+                backStackViewModel.navigateToDownload(backStackViewModel.downloadGameScreen)
+            }
+            val toDownloadModScreen: () -> Unit = {
+                backStackViewModel.navigateToDownload(backStackViewModel.downloadModScreen)
+            }
 
             NeobrutalDashboard(
                 modifier = Modifier.fillMaxSize(),
@@ -205,12 +203,8 @@ fun LauncherScreen(
                 toAccountManageScreen = toAccountManageScreen,
                 toVersionManageScreen = toVersionManageScreen,
                 toVersionSettingsScreen = toVersionSettingsScreen,
-                toDownloadScreen = {
-                    backStackViewModel.mainScreen.removeAndNavigateTo(
-                        removes = backStackViewModel.clearBeforeNavKeys,
-                        screenKey = backStackViewModel.downloadScreen
-                    )
-                },
+                toDownloadScreen = toDownloadGameScreen,
+                toDownloadModScreen = toDownloadModScreen,
                 toSettingsScreen = {
                     backStackViewModel.mainScreen.removeAndNavigateTo(
                         removes = backStackViewModel.clearBeforeNavKeys,

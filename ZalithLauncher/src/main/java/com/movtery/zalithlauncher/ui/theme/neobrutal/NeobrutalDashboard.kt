@@ -69,6 +69,7 @@ fun NeobrutalDashboard(
     toVersionManageScreen: () -> Unit,
     toVersionSettingsScreen: () -> Unit,
     toDownloadScreen: () -> Unit,
+    toDownloadModScreen: () -> Unit = toDownloadScreen,
     toSettingsScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -121,7 +122,7 @@ fun NeobrutalDashboard(
                     currentAccount = currentAccount,
                     onBerandaClick = { /* Already at home */ },
                     onDownloadClick = toDownloadScreen,
-                    onModsClick = toDownloadScreen,
+                    onModsClick = toDownloadModScreen,
                     onSettingsClick = toSettingsScreen,
                     onAccountClick = toAccountManageScreen
                 )
@@ -159,7 +160,8 @@ fun NeobrutalDashboard(
                     // Left 3: Current Active Version Box
                     ActiveVersionOverviewCard(
                         version = currentVersion,
-                        onDetailClick = toVersionSettingsScreen
+                        onDetailClick = toVersionSettingsScreen,
+                        onDownloadClick = toDownloadScreen
                     )
                 }
 
@@ -175,7 +177,8 @@ fun NeobrutalDashboard(
                     // Right 1: Massive Hero "MAINKAN" Card
                     HeroPlayCard(
                         version = currentVersion,
-                        onPlayClick = { onLaunchGame(currentVersion) }
+                        onPlayClick = { onLaunchGame(currentVersion) },
+                        onDownloadClick = toDownloadScreen
                     )
 
                     // Right 2: Fast Instance Selector Card
@@ -217,7 +220,7 @@ private fun NeobrutalTopBar(
     ) {
         // App Title Brand Pill
         NeobrutalPillButton(
-            text = "🎮 SA LAUNCHER ★",
+            text = "SA LAUNCHER",
             backgroundColor = NeobrutalTokens.AccentPrimary,
             textColor = Color.Black,
             onClick = onBerandaClick
@@ -231,28 +234,28 @@ private fun NeobrutalTopBar(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             NeobrutalPillButton(
-                text = "🏠 BERANDA",
+                text = "BERANDA",
                 backgroundColor = NeobrutalTokens.AccentPrimary,
                 textColor = Color.Black,
                 onClick = onBerandaClick
             )
 
             NeobrutalPillButton(
-                text = "📥 DOWNLOAD",
+                text = "DOWNLOAD",
                 backgroundColor = Color.White,
                 textColor = Color.Black,
                 onClick = onDownloadClick
             )
 
             NeobrutalPillButton(
-                text = "🧩 MODS & LOADER",
+                text = "MODS & LOADER",
                 backgroundColor = Color.White,
                 textColor = Color.Black,
                 onClick = onModsClick
             )
 
             NeobrutalPillButton(
-                text = "⚙ PENGATURAN",
+                text = "PENGATURAN",
                 backgroundColor = NeobrutalTokens.AccentPink,
                 textColor = Color.Black,
                 onClick = onSettingsClick
@@ -261,9 +264,9 @@ private fun NeobrutalTopBar(
 
         Spacer(modifier = Modifier.width(10.dp))
 
-        // Battery & Wifi Pill
+        // Battery & Network Pill
         NeobrutalPillBadge(
-            text = "⚡ 88%  |  📶",
+            text = "BAT: 88%  |  NET: OK",
             backgroundColor = Color(0xFFE8F7F0),
             textColor = Color.Black,
             borderWidth = 2.dp
@@ -274,7 +277,7 @@ private fun NeobrutalTopBar(
         // User Account Pill
         val accountName = currentAccount?.username
         NeobrutalPillButton(
-            text = if (accountName != null) "$accountName 👤" else "+ Login Akun 👤",
+            text = if (accountName != null) "$accountName [USER]" else "+ LOGIN AKUN",
             backgroundColor = if (accountName != null) Color.White else NeobrutalTokens.AccentPrimary,
             textColor = Color.Black,
             onClick = onAccountClick
@@ -294,6 +297,8 @@ private fun UserProfileCard(
     val username = account?.username ?: "Belum Ada Akun"
     val uuidDisplay = account?.uniqueUUID?.take(18) ?: "Login untuk bermain"
     val authType = account?.let { getAccountTypeName(it) } ?: "BELUM LOGIN"
+
+    val hasCape = account != null && account.hasSkinFile && account.getCapeFile().exists()
 
     NeobrutalWindowBox(
         title = if (account != null) "PROFIL PENGGUNA // SLOT #01" else "PROFIL PENGGUNA // BELUM LOGIN",
@@ -323,7 +328,7 @@ private fun UserProfileCard(
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {
-                        Text(text = "👤", fontSize = 28.sp)
+                        Text(text = "[USER]", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
                     }
                 }
 
@@ -340,9 +345,9 @@ private fun UserProfileCard(
                         if (account != null) {
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "✓",
+                                text = "[OK]",
                                 color = NeobrutalTokens.AccentOrange,
-                                fontSize = 14.sp,
+                                fontSize = 11.sp,
                                 fontWeight = FontWeight.Black
                             )
                         }
@@ -358,14 +363,12 @@ private fun UserProfileCard(
                     Spacer(modifier = Modifier.height(6.dp))
 
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        if (account != null) {
-                            NeobrutalPillBadge(
-                                text = "Cape: Migrator",
-                                backgroundColor = Color(0xFFF0FDF4),
-                                textColor = Color(0xFF166534),
-                                borderWidth = 1.5.dp
-                            )
-                        }
+                        NeobrutalPillBadge(
+                            text = if (hasCape) "Cape: Active" else "Cape: Off",
+                            backgroundColor = if (hasCape) Color(0xFFF0FDF4) else Color(0xFFF3F4F6),
+                            textColor = if (hasCape) Color(0xFF166534) else Color(0xFF6B7280),
+                            borderWidth = 1.5.dp
+                        )
                         NeobrutalPillBadge(
                             text = authType,
                             backgroundColor = if (account != null) Color(0xFFEFF6FF) else Color(0xFFFFF1F2),
@@ -398,7 +401,7 @@ private fun UserProfileCard(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "🔄 GANTI AKUN", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
+                            Text(text = "GANTI AKUN", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
                         }
                     }
 
@@ -416,7 +419,7 @@ private fun UserProfileCard(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "👕 EDIT SKIN", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
+                            Text(text = "EDIT SKIN", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
                         }
                     }
                 }
@@ -435,7 +438,7 @@ private fun UserProfileCard(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "🔑 LOGIN AKUN (MS / OFFLINE / ELY.BY)", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
+                        Text(text = "LOGIN AKUN (MS / OFFLINE / ELY.BY)", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
                     }
                 }
             }
@@ -459,14 +462,14 @@ private fun PlaytimeActivityCard() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "⏱ AKTIVITAS & WAKTU BERMAIN",
+                    text = "AKTIVITAS & WAKTU BERMAIN",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Black,
                     color = Color.Black,
                     modifier = Modifier.weight(1f)
                 )
                 NeobrutalPillBadge(
-                    text = "PEMAIN AKTIF",
+                    text = "STATUS: SIAP",
                     backgroundColor = NeobrutalTokens.AccentMint,
                     textColor = Color.Black,
                     borderWidth = 1.5.dp
@@ -482,20 +485,20 @@ private fun PlaytimeActivityCard() {
             ) {
                 StatSubBox(
                     label = "TOTAL PLAYTIME",
-                    value = "142.5 Jam",
+                    value = "0 Jam",
                     bgColor = Color.White,
                     modifier = Modifier.weight(1f)
                 )
                 StatSubBox(
                     label = "SESI TERAKHIR",
-                    value = "2h 15m",
+                    value = "0 Menit",
                     valueColor = NeobrutalTokens.AccentSecondary,
                     bgColor = Color.White,
                     modifier = Modifier.weight(1f)
                 )
                 StatSubBox(
                     label = "STREAK MAIN",
-                    value = "7 Hari 🔥",
+                    value = "0 Hari",
                     bgColor = Color(0xFFFFF9DB),
                     modifier = Modifier.weight(1f)
                 )
@@ -547,7 +550,9 @@ private fun ActiveVersionOverviewCard(
     version: Version?,
     onDetailClick: () -> Unit
 ) {
-    val versionName = version?.getVersionName() ?: "Fabric 1.20.1 (0.15.11)"
+    val hasVersion = version != null
+    val versionName = if (hasVersion) version!!.getVersionName() else "BELUM ADA VERSI"
+    val subtitle = if (hasVersion) "MobileGL v2.4 • Vulkan Pipe" else "Unduh Minecraft dari menu DOWNLOAD"
 
     NeobrutalCard(
         modifier = Modifier.fillMaxWidth(),
@@ -564,11 +569,16 @@ private fun ActiveVersionOverviewCard(
             Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .background(NeobrutalTokens.AccentMint, RoundedCornerShape(8.dp))
+                    .background(if (hasVersion) NeobrutalTokens.AccentMint else Color(0xFFF3F4F6), RoundedCornerShape(8.dp))
                     .border(2.dp, Color.Black, RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "🧱", fontSize = 18.sp)
+                Text(
+                    text = if (hasVersion) "MC" else "[--]",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.Black
+                )
             }
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -578,7 +588,7 @@ private fun ActiveVersionOverviewCard(
                     text = "VERSI AKTIF SAAT INI",
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF16A34A)
+                    color = if (hasVersion) Color(0xFF16A34A) else NeobrutalTokens.TextMuted
                 )
                 Text(
                     text = versionName,
@@ -589,7 +599,7 @@ private fun ActiveVersionOverviewCard(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "MobileGL v2.4 • Vulkan Pipe",
+                    text = subtitle,
                     fontSize = 9.sp,
                     color = NeobrutalTokens.TextMuted
                 )
@@ -597,15 +607,15 @@ private fun ActiveVersionOverviewCard(
 
             NeobrutalButton(
                 onClick = onDetailClick,
-                backgroundColor = NeobrutalTokens.AccentSecondary,
+                backgroundColor = if (hasVersion) NeobrutalTokens.AccentSecondary else NeobrutalTokens.AccentPrimary,
                 shadowOffset = 2.5.dp,
                 cornerRadius = 8.dp
             ) {
                 Text(
-                    text = "↗ DETAIL",
+                    text = if (hasVersion) "↗ DETAIL" else "+ UNDUH ↗",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Black,
-                    color = Color.White,
+                    color = if (hasVersion) Color.White else Color.Black,
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                 )
             }
@@ -621,11 +631,14 @@ private fun HeroPlayCard(
     version: Version?,
     onPlayClick: () -> Unit
 ) {
-    val versionName = version?.getVersionName() ?: "FABRIC 1.20.1"
+    val hasVersion = version != null
+    val versionName = if (hasVersion) version!!.getVersionName().uppercase() else "BELUM ADA VERSI"
+    val actionText = if (hasVersion) "▶ MAINKAN" else "▶ UNDUH MINECRAFT"
+    val statusText = if (hasVersion) "READY TO LAUNCH" else "STATUS: BELUM ADA VERSI"
 
     NeobrutalCard(
         modifier = Modifier.fillMaxWidth(),
-        backgroundColor = NeobrutalTokens.AccentPrimary,
+        backgroundColor = if (hasVersion) NeobrutalTokens.AccentPrimary else Color(0xFFFFD166),
         shadowOffset = NeobrutalTokens.ShadowHero,
         borderWidth = NeobrutalTokens.BorderHeavy,
         cornerRadius = 16.dp
@@ -639,7 +652,7 @@ private fun HeroPlayCard(
             Column(modifier = Modifier.weight(1f)) {
                 // Top Tag
                 NeobrutalPillBadge(
-                    text = "READY TO LAUNCH",
+                    text = statusText,
                     backgroundColor = Color.Black,
                     textColor = Color.White,
                     borderWidth = 1.5.dp
@@ -653,8 +666,8 @@ private fun HeroPlayCard(
                     modifier = Modifier.clickable { onPlayClick() }
                 ) {
                     Text(
-                        text = "▶ MAINKAN",
-                        fontSize = 26.sp,
+                        text = actionText,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Black,
                         color = Color.Black,
                         letterSpacing = 1.sp
@@ -663,7 +676,7 @@ private fun HeroPlayCard(
                     Spacer(modifier = Modifier.width(8.dp))
 
                     NeobrutalPillBadge(
-                        text = versionName.uppercase(),
+                        text = versionName,
                         backgroundColor = Color.White,
                         textColor = Color.Black,
                         borderWidth = 2.dp
@@ -673,14 +686,14 @@ private fun HeroPlayCard(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "⚡ DIRECT VULKAN PIPELINE • OFFLINE/ONLINE READY",
+                    text = "DIRECT VULKAN PIPELINE • OFFLINE/ONLINE READY",
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Black,
                     color = Color.Black
                 )
             }
 
-            // Rocket Quick Launch Box
+            // Quick Action Box
             Box(
                 modifier = Modifier
                     .size(52.dp)
@@ -688,7 +701,12 @@ private fun HeroPlayCard(
                     .clickable { onPlayClick() },
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "🚀", fontSize = 24.sp)
+                Text(
+                    text = if (hasVersion) "▶" else "+",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Black,
+                    color = NeobrutalTokens.AccentPrimary
+                )
             }
         }
     }
@@ -717,7 +735,7 @@ private fun FastInstanceSelectorCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "🗂 PROFILE INSTANCE CEPAT",
+                    text = "[PROFIL] INSTANCE CEPAT",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Black,
                     color = Color.Black,
@@ -735,32 +753,60 @@ private fun FastInstanceSelectorCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Instances List (Horizontal row)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (versionsList.isEmpty()) {
-                    // Placeholder card matching mockup
-                    InstanceItemCard(
-                        name = "Fabric Performance",
-                        info = "1.20.1 • 42 Mods Loaded",
-                        isActive = true,
-                        badgeText = "AKTIF",
-                        badgeColor = NeobrutalTokens.AccentMint,
-                        onClick = {}
-                    )
-                    InstanceItemCard(
-                        name = "Forge OptiFine",
-                        info = "1.16.5 • BSL Shaders Ready",
-                        isActive = false,
-                        badgeText = "SIAP",
-                        badgeColor = Color(0xFFF3F4F6),
-                        onClick = {}
-                    )
-                } else {
+            if (versionsList.isEmpty()) {
+                // Clean empty state card (No fake instances)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFF9FAFB), RoundedCornerShape(8.dp))
+                        .border(1.5.dp, Color(0xFFD1D5DB), RoundedCornerShape(8.dp))
+                        .padding(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "BELUM ADA INSTANCE / VERSI TERPASANG",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color.Black
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "Silakan unduh Vanilla / Fabric / Forge dari menu DOWNLOAD.",
+                                fontSize = 9.sp,
+                                color = NeobrutalTokens.TextMuted
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        NeobrutalButton(
+                            onClick = onCreateInstanceClick,
+                            backgroundColor = NeobrutalTokens.AccentPrimary,
+                            shadowOffset = 2.dp,
+                            cornerRadius = 6.dp
+                        ) {
+                            Text(
+                                text = "+ UNDUH VERSI ↗",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color.Black,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                }
+            } else {
+                // Instances List (Horizontal row)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     versionsList.take(4).forEach { version ->
                         val isCurrent = version.getVersionName() == currentVersion?.getVersionName()
                         InstanceItemCard(
@@ -788,7 +834,7 @@ private fun FastInstanceSelectorCard(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "⊕ + BUAT INSTANCE ATAU PASANG DARI FILE (.ZIP / .MRPACK)",
+                    text = "+ BUAT INSTANCE ATAU PASANG DARI FILE (.ZIP / .MRPACK)",
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Black,
                     color = Color.Black

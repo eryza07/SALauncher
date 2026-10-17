@@ -25,22 +25,31 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.movtery.zalithlauncher.BuildKeys
 import com.movtery.zalithlauncher.components.InstallableItem
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.rememberTransitionSpec
-import com.movtery.zalithlauncher.ui.theme.onBackgroundColor
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalDottedCanvas
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalPillBadge
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalTokens
 import com.movtery.zalithlauncher.viewmodel.SplashBackStackViewModel
 
 /**
@@ -53,25 +62,29 @@ fun SplashScreen(
     unpackItems: List<InstallableItem>,
     screenViewModel: SplashBackStackViewModel
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        TopBar(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp),
-            contentColor = onBackgroundColor()
-        )
+    NeobrutalDottedCanvas {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            TopBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp)
+                    .background(Color.White)
+                    .border(width = 2.dp, color = Color.Black),
+                contentColor = Color.Black
+            )
 
-        NavigationUI(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            startAllTask = startAllTask,
-            unpackItems = unpackItems,
-            screenViewModel = screenViewModel
-        )
+            NavigationUI(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                startAllTask = startAllTask,
+                unpackItems = unpackItems,
+                screenViewModel = screenViewModel
+            )
+        }
     }
 }
 
@@ -80,18 +93,34 @@ private fun TopBar(
     modifier: Modifier = Modifier,
     contentColor: Color,
 ) {
-    CompositionLocalProvider(
-        LocalContentColor provides contentColor
+    Row(
+        modifier = modifier.padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.Center
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(NeobrutalTokens.AccentPrimary, RoundedCornerShape(2.dp))
+                    .border(1.5.dp, Color.Black, RoundedCornerShape(2.dp))
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
-                modifier = Modifier.align(Alignment.CenterVertically),
-                text = BuildKeys.LAUNCHER_NAME
+                text = "${BuildKeys.LAUNCHER_NAME.uppercase()} // INITIAL SETUP",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Black,
+                color = Color.Black,
+                letterSpacing = 1.sp
             )
         }
+
+        NeobrutalPillBadge(
+            text = "RUNTIME SETUP",
+            backgroundColor = NeobrutalTokens.AccentMint,
+            textColor = Color.Black,
+            borderWidth = 1.5.dp
+        )
     }
 }
 

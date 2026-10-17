@@ -69,7 +69,7 @@ fun NeobrutalCrashDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "⚠ SYSTEM ALERT: CRASH DETECTED",
+                        text = "[!] SYSTEM ALERT: CRASH DETECTED",
                         color = Color.Black,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Black,
@@ -84,7 +84,7 @@ fun NeobrutalCrashDialog(
                             .clickable { onDismiss() }
                             .padding(horizontal = 6.dp, vertical = 1.dp)
                     ) {
-                        Text(text = "✕", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
+                        Text(text = "X", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
                     }
                 }
 
@@ -177,7 +177,7 @@ fun NeobrutalCrashDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "⬆ UPLOAD KE MCLO.GS & SALIN LINK",
+                                text = "^ UPLOAD KE MCLO.GS & SALIN LINK",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Black,
                                 color = Color.Black
@@ -207,7 +207,7 @@ fun NeobrutalCrashDialog(
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 Text(
-                                    text = "⎘ Salin Log Mentah",
+                                    text = "[SALIN] Log Mentah",
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Black
@@ -229,7 +229,7 @@ fun NeobrutalCrashDialog(
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 Text(
-                                    text = "⚙ Buka Setting RAM",
+                                    text = "[SETTING] Buka Setting RAM",
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Black
