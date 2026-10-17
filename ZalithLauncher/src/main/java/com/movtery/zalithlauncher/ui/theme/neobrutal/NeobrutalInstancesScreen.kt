@@ -206,7 +206,7 @@ fun NeobrutalInstancesScreen(
                         )
                         ConfigDropdownItem(
                             label = "RENDERER",
-                            value = "${AllSettings.rendererV2.state.name} ▾",
+                            value = "${AllSettings.renderer.state.ifEmpty { "gl4es" }} ▾",
                             modifier = Modifier.weight(1f)
                         )
                     }

@@ -212,8 +212,9 @@ fun NeobrutalAccountsScreen(
                             .padding(4.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (currentAccount != null) {
-                            PlayerFace(account = currentAccount, avatarSize = 60.dp, modifier = Modifier.fillMaxSize())
+                        val cur = currentAccount
+                        if (cur != null) {
+                            PlayerFace(account = cur, avatarSize = 60.dp, modifier = Modifier.fillMaxSize())
                         } else {
                             Text(text = "[USER]", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.Black)
                         }
@@ -375,9 +376,18 @@ fun NeobrutalAccountsScreen(
                         .border(2.dp, Color.Black, RoundedCornerShape(8.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (currentAccount != null) {
+                    val curAccount = currentAccount
+                    val skinFile = remember(curAccount) {
+                        curAccount?.getSkinFile()?.takeIf { it.exists() }
+                    }
+                    val capeFile = remember(curAccount) {
+                        curAccount?.getCapeFile()?.takeIf { it.exists() }
+                    }
+                    if (curAccount != null) {
                         SkinPreview3D(
-                            account = currentAccount!!,
+                            skinFile = skinFile,
+                            capeFile = capeFile,
+                            modelType = curAccount.skinModelType,
                             modifier = Modifier.fillMaxSize()
                         )
                     } else {

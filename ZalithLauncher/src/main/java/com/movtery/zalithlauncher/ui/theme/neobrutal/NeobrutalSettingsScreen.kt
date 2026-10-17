@@ -63,7 +63,7 @@ fun NeobrutalSettingsScreen(
     val totalRamMb = remember(context) { runCatching { getTotalMemory(context).bytesToMB().toInt() }.getOrDefault(4096) }
     var ramAlloc by remember { mutableIntStateOf(AllSettings.ramAllocation.getOrMin().coerceIn(512, totalRamMb)) }
     var selectedCategory by remember { mutableStateOf("Renderer") }
-    var selectedRenderer by remember { mutableStateOf(AllSettings.rendererV2.state.name) }
+    var selectedRenderer by remember { mutableStateOf(AllSettings.renderer.state.ifEmpty { "gl4es" }) }
     var autoRam by remember { mutableStateOf(AllSettings.autoPickJavaRuntime.state) }
     var saveLog by remember { mutableStateOf(true) }
     var jvmArgs by remember { mutableStateOf("-XX:+UseG1GC -XX:+UnlockExperimentalVMOptions") }

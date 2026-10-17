@@ -84,13 +84,14 @@ fun NeobrutalModsScreen(
         coroutineScope.launch {
             isLoadingMods = true
             val loaded = withContext(Dispatchers.IO) {
-                val modsDir = File(currentVersion.getGameDir(), "mods")
+                val curVer = currentVersion ?: return@withContext emptyList<ModDisplayItem>()
+                val modsDir = File(curVer.getGameDir(), "mods")
                 if (!modsDir.exists() || !modsDir.isDirectory) {
-                    emptyList()
+                    emptyList<ModDisplayItem>()
                 } else {
-                    val files = modsDir.listFiles()?.filter {
+                    val files: List<File> = modsDir.listFiles()?.filter {
                         it.isFile && (it.name.endsWith(".jar") || it.name.endsWith(".jar.disabled"))
-                    } ?: emptyArray()
+                    } ?: emptyList<File>()
 
                     files.map { file ->
                         val isEnabled = !file.name.endsWith(".disabled")
