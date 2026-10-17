@@ -71,6 +71,7 @@ fun NeobrutalDashboard(
     toDownloadScreen: () -> Unit,
     toDownloadModScreen: () -> Unit = toDownloadScreen,
     toSettingsScreen: () -> Unit,
+    showTopBar: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val currentAccount by AccountsManager.currentAccountFlow.collectAsStateWithLifecycle()
@@ -103,32 +104,33 @@ fun NeobrutalDashboard(
         label = "DashboardAlpha"
     )
 
-    NeobrutalDottedCanvas(
-        modifier = modifier
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
             // 1. TOP NAVIGATION BAR (As depicted in Mockup)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset(y = topBarOffset)
-                    .graphicsLayer { alpha = alphaAnim }
-            ) {
-                NeobrutalTopBar(
-                    currentAccount = currentAccount,
-                    onBerandaClick = { /* Already at home */ },
-                    onDownloadClick = toDownloadScreen,
-                    onModsClick = toDownloadModScreen,
-                    onSettingsClick = toSettingsScreen,
-                    onAccountClick = toAccountManageScreen
-                )
-            }
+            if (showTopBar) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = topBarOffset)
+                        .graphicsLayer { alpha = alphaAnim }
+                ) {
+                    NeobrutalTopBar(
+                        currentAccount = currentAccount,
+                        onBerandaClick = { /* Already at home */ },
+                        onDownloadClick = toDownloadScreen,
+                        onModsClick = toDownloadModScreen,
+                        onSettingsClick = toSettingsScreen,
+                        onAccountClick = toAccountManageScreen
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+            }
 
             // 2. MAIN BODY (Split into Left Column & Right Column)
             Row(

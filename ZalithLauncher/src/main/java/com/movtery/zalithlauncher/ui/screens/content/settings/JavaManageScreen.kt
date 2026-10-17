@@ -36,6 +36,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -383,7 +385,8 @@ private fun JavaRuntimeItem(
         modifier = modifier.graphicsLayer(scaleY = scale.value, scaleX = scale.value),
         color = color,
         contentColor = contentColor,
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.5.dp, Color.Black),
         onClick = onClick
     ) {
         Row(
@@ -476,10 +479,11 @@ private fun SelectJavaRuntimeDialog(
                     .fillMaxWidth()
                     .heightIn(max = (maxHeight - 12.dp).coerceAtMost(rememberDialogMaxHeight()))
                     .wrapContentHeight(),
-                shape = MaterialTheme.shapes.extraLarge,
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(2.dp, Color.Black),
                 color = cardColor(false),
                 contentColor = onCardColor(),
-                shadowElevation = 6.dp
+                shadowElevation = 0.dp
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -512,7 +516,7 @@ private fun SelectJavaRuntimeDialog(
                         }
                     }
 
-                    Button(
+                    com.movtery.zalithlauncher.ui.components.ScalingActionButton(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = onDismissRequest
                     ) {

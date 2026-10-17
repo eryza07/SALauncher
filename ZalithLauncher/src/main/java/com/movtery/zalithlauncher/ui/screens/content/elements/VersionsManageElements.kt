@@ -21,6 +21,8 @@ package com.movtery.zalithlauncher.ui.screens.content.elements
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
@@ -707,7 +709,8 @@ fun VersionItemLayout(
         modifier = modifier.graphicsLayer(scaleY = scale.value, scaleX = scale.value),
         color = color,
         contentColor = contentColor,
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(if (selected) 2.5.dp else 1.5.dp, Color.Black),
         onClick = {
             if (selected) return@Surface
             onSelected()
@@ -716,7 +719,7 @@ fun VersionItemLayout(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(shape = MaterialTheme.shapes.large)
+                .clip(shape = RoundedCornerShape(12.dp))
                 .backgroundGlass(blur, color, influencedByBackground)
                 .padding(all = 4.dp),
             verticalAlignment = Alignment.CenterVertically

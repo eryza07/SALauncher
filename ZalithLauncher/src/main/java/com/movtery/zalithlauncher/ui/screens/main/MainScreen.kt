@@ -86,6 +86,7 @@ import com.movtery.zalithlauncher.ui.components.BackgroundCard
 import com.movtery.zalithlauncher.ui.components.CardTitleLayout
 import com.movtery.zalithlauncher.ui.components.TextRailItem
 import com.movtery.zalithlauncher.ui.guide.sendStartGuideOnce
+import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.ui.screens.BackStackNavKey
 import com.movtery.zalithlauncher.ui.screens.NestedNavKey
 import com.movtery.zalithlauncher.ui.screens.NormalNavKey
@@ -93,6 +94,7 @@ import com.movtery.zalithlauncher.ui.screens.TitledNavKey
 import com.movtery.zalithlauncher.ui.screens.content.AccountManageScreen
 import com.movtery.zalithlauncher.ui.screens.content.DownloadScreen
 import com.movtery.zalithlauncher.ui.screens.content.FileSelectorScreen
+import com.movtery.zalithlauncher.ui.screens.content.FirstLoginMenu
 import com.movtery.zalithlauncher.ui.screens.content.LauncherScreen
 import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
 import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
@@ -107,6 +109,9 @@ import com.movtery.zalithlauncher.ui.screens.content.navigateToDownload
 import com.movtery.zalithlauncher.ui.screens.navigateTo
 import com.movtery.zalithlauncher.ui.screens.onBack
 import com.movtery.zalithlauncher.ui.screens.rememberTransitionSpec
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalDottedCanvas
+import com.movtery.zalithlauncher.ui.theme.neobrutal.NeobrutalSubHeader
+import com.movtery.zalithlauncher.ui.theme.neobrutal.UniversalNeobrutalTopBar
 import com.movtery.zalithlauncher.ui.theme.backgroundColor
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.festivals.FestivalTitleText
@@ -158,63 +163,114 @@ fun MainScreen(
     val mainScreenKey = screenBackStackModel.mainScreen.currentKey
     val inLauncherScreen = mainScreenKey == null || mainScreenKey is NormalNavKey.LauncherMain
 
-    val isBackgroundValid = LocalBackgroundViewModel.current?.isValid == true
-    val launcherBackgroundOpacity = AllSettings.launcherBackgroundOpacity.state.toFloat() / 100f
+    val currentAccount by AccountsManager.currentAccountFlow.collectAsStateWithLifecycle()
+    val accounts by AccountsManager.accountsFlow.collectAsStateWithLifecycle()
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-    val backgroundColor = if (isBackgroundValid) {
-        backgroundColor().copy(alpha = launcherBackgroundOpacity)
-    } else backgroundColor()
+    val toAccountManageScreen: () -> Unit = {
+        val hasAccounts = accounts.isNotEmpty()
+        screenBackStackModel.mainScreen.navigateTo(
+            screenKey = NormalNavKey.AccountManager(
+                if (hasAccounts) FirstLoginMenu.NONE else FirstLoginMenu.NORMAL
+            )
+        )
+    }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = backgroundColor,
-        contentColor = onBackgroundColor()
+    val toDownloadScreen: () -> Unit = {
+        screenBackStackModel.navigateToDownload()
+    }
+
+    val toDownloadModScreen: () -> Unit = {
+        screenBackStackModel.navigateToDownload(screenBackStackModel.downloadModScreen)
+    }
+
+    val toSettingsScreen: () -> Unit = {
+        screenBackStackModel.mainScreen.removeAndNavigateTo(
+            removes = screenBackStackModel.clearBeforeNavKeys,
+            screenKey = screenBackStackModel.settingsScreen
+        )
+    }
+
+    val toModsScreen: () -> Unit = {
+        VersionsManager.currentVersion.value?.let { version ->
+            screenBackStackModel.mainScreen.navigateTo(
+                screenKey = NestedNavKey.VersionSettings(version),
+                useClassEquality = true
+            )
+        } ?: run {
+            screenBackStackModel.navigateToDownload(screenBackStackModel.downloadModScreen)
+        }
+    }
+
+    val openFileManager: () -> Unit = {
+        eventViewModel.sendEvent(
+            EventViewModel.Event.OpenFileManager(
+                rootPath = PathManager.DIR_FILES_EXTERNAL.absolutePath
+            )
+        )
+    }
+
+    NeobrutalDottedCanvas(
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(horizontal = 14.dp, vertical = 8.dp)
         ) {
+            // Universal Top Bar across all screens (Pages 1 through 9 in Zalith.pdf)
+            UniversalNeobrutalTopBar(
+                currentKey = mainScreenKey,
+                currentAccount = currentAccount,
+                taskRunning = tasks.isNotEmpty(),
+                isTasksExpanded = isTaskMenuExpanded,
+                onBerandaClick = toMainScreen,
+                onDownloadClick = toDownloadScreen,
+                onModsClick = toModsScreen,
+                onFileManagerClick = openFileManager,
+                onSettingsClick = toSettingsScreen,
+                onAccountClick = toAccountManageScreen,
+                onChangeTasksExpanded = { changeTasksExpandedState() }
+            )
+
+            // Sub-Header on all sub-screens (Pages 2 through 8 in Zalith.pdf)
             if (!inLauncherScreen) {
-                TopBar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp),
-                    mainScreenKey = mainScreenKey,
-                    inLauncherScreen = inLauncherScreen,
-                    taskRunning = tasks.isEmpty(),
-                    isTasksExpanded = isTaskMenuExpanded,
-                    contentColor = onBackgroundColor(),
-                    onScreenBack = {
-                        screenBackStackModel.mainScreen.backStack.removeFirstOrNull()
+                Spacer(modifier = Modifier.height(6.dp))
+                NeobrutalSubHeader(
+                    currentKey = mainScreenKey,
+                    onBack = {
+                        backDispatcher?.onBackPressed() ?: run {
+                            screenBackStackModel.mainScreen.backStack.removeFirstOrNull()
+                        }
                     },
-                    toMainScreen = toMainScreen,
-                    toSettingsScreen = {
-                        screenBackStackModel.mainScreen.removeAndNavigateTo(
-                            removes = screenBackStackModel.clearBeforeNavKeys,
-                            screenKey = screenBackStackModel.settingsScreen
-                        )
-                    },
-                    toDownloadScreen = {
+                    onRefreshDownload = {
                         screenBackStackModel.navigateToDownload()
                     },
-                    toMultiplayerScreen = {
-                        screenBackStackModel.mainScreen.removeAndNavigateTo(
-                            removes = screenBackStackModel.clearBeforeNavKeys,
-                            screenKey = NormalNavKey.Multiplayer
-                        )
+                    onCreateInstance = {
+                        screenBackStackModel.navigateToDownload()
                     },
-                    openFileManager = {
-                        eventViewModel.sendEvent(
-                            EventViewModel.Event.OpenFileManager(
-                                rootPath = PathManager.DIR_FILES_EXTERNAL.absolutePath
-                            )
-                        )
+                    onImportMrpack = {
+                        openFileManager()
                     },
-                    changeExpandedState = {
-                        changeTasksExpandedState()
+                    onAddAccount = {
+                        toAccountManageScreen()
                     },
+                    onImportJar = {
+                        openFileManager()
+                    },
+                    onExploreMods = {
+                        toDownloadModScreen()
+                    },
+                    onImportFile = {
+                        openFileManager()
+                    },
+                    onNewFolder = {
+                        openFileManager()
+                    }
                 )
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Box(
                 modifier = Modifier
@@ -245,243 +301,6 @@ fun MainScreen(
             }
         }
     }
-}
-
-@Composable
-private fun <E: TitledNavKey> TopBar(
-    mainScreenKey: E?,
-    inLauncherScreen: Boolean,
-    taskRunning: Boolean,
-    isTasksExpanded: Boolean,
-    modifier: Modifier = Modifier,
-    contentColor: Color,
-    onScreenBack: () -> Unit,
-    toMainScreen: () -> Unit,
-    toSettingsScreen: () -> Unit,
-    toDownloadScreen: () -> Unit,
-    toMultiplayerScreen: () -> Unit,
-    openFileManager: () -> Unit,
-    changeExpandedState: () -> Unit,
-) {
-    val festivals = LocalFestivals.current
-
-    val inMultiplayerScreen = mainScreenKey is NormalNavKey.Multiplayer
-    val inDownloadScreen = mainScreenKey is NestedNavKey.Download
-    val inSettingsScreen = mainScreenKey is NestedNavKey.Settings
-
-    CompositionLocalProvider(
-        LocalContentColor provides contentColor
-    ) {
-        ConstraintLayout(modifier = modifier) {
-            val (backCenter, title, endButtons) = createRefs()
-
-            val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
-            Row(
-                modifier = Modifier
-                    .constrainAs(backCenter) {
-                        start.linkTo(parent.start)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    }
-                    .fillMaxHeight()
-            ) {
-                AnimatedVisibility(
-                    visible = !inLauncherScreen
-                ) {
-                    Row(modifier = Modifier.fillMaxHeight()) {
-                        Spacer(Modifier.width(12.dp))
-
-                        IconButton(
-                            modifier = Modifier.fillMaxHeight(),
-                            onClick = {
-                                if (!inLauncherScreen) {
-                                    //不在主屏幕时才允许返回
-                                    backDispatcher?.onBackPressed() ?: run {
-                                        onScreenBack()
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(R.drawable.ic_arrow_back),
-                                contentDescription = stringResource(R.string.generic_back)
-                            )
-                        }
-
-                        IconButton(
-                            modifier = Modifier.fillMaxHeight(),
-                            onClick = {
-                                if (!inLauncherScreen) {
-                                    //不在主屏幕时才允许回到主页面
-                                    toMainScreen()
-                                }
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_home_filled),
-                                contentDescription = stringResource(R.string.generic_main_menu)
-                            )
-                        }
-                    }
-                }
-            }
-            val parentRes = mainScreenKey?.title
-            val childRes = (mainScreenKey as? BackStackNavKey<*>)?.currentKey?.title
-
-            Crossfade(
-                modifier = Modifier.constrainAs(title) {
-                    centerVerticallyTo(parent)
-                    start.linkTo(backCenter.end, margin = 16.dp)
-                },
-                targetState = parentRes to childRes
-            ) { (parent, child) ->
-                val style = MaterialTheme.typography.titleMedium
-                val softWarp = false
-                val maxLines = 1
-
-                if (parent == null) {
-                    if (festivals.isEmpty()) {
-                        Text(
-                            text = BuildKeys.LAUNCHER_IDENTIFIER,
-                            style = style,
-                            softWrap = softWarp,
-                            maxLines = maxLines
-                        )
-                    } else {
-                        FestivalTitleText(
-                            festivals = festivals,
-                            style = style,
-                            maxLines = maxLines
-                        )
-                    }
-                } else {
-                    val titleText = if (child != null) {
-                        androidText(parent, androidText(" - "), child)
-                    } else {
-                        parent
-                    }
-
-                    AndroidStringText(
-                        text = titleText,
-                        style = style,
-                        softWrap = softWarp,
-                        maxLines = maxLines
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .constrainAs(endButtons) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, margin = 12.dp)
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                AnimatedVisibility(
-                    visible = !(isTasksExpanded || taskRunning),
-                    enter = slideInVertically(
-                        initialOffsetY = { -50 }
-                    ) + fadeIn(),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -50 }
-                    ) + fadeOut()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(shape = MaterialTheme.shapes.large)
-                            .clickable { changeExpandedState() }
-                            .padding(all = 8.dp)
-                            .width(120.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        LinearProgressIndicator(modifier = Modifier.weight(1f))
-                        Icon(
-                            modifier = Modifier.size(22.dp),
-                            painter = painterResource(R.drawable.ic_assignment_filled),
-                            contentDescription = stringResource(R.string.main_task_menu)
-                        )
-                    }
-                }
-
-                IconButton(
-                    onClick = openFileManager
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_folder_filled),
-                        contentDescription = null
-                    )
-                }
-
-                TopBarRailItem(
-                    selected = inMultiplayerScreen,
-                    painter = painterResource(R.drawable.ic_group_filled),
-                    text = stringResource(R.string.terracotta),
-                    onClick = {
-                        if (!inMultiplayerScreen) toMultiplayerScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inDownloadScreen,
-                    painter = painterResource(R.drawable.ic_download_2_filled),
-                    text = stringResource(R.string.generic_download),
-                    onClick = {
-                        if (!inDownloadScreen) toDownloadScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inSettingsScreen,
-                    painter = painterResource(R.drawable.ic_settings_filled),
-                    text = stringResource(R.string.generic_setting),
-                    onClick = {
-                        if (!inSettingsScreen) toSettingsScreen()
-                    },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TopBarRailItem(
-    selected: Boolean,
-    painter: Painter,
-    text: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
-    textStyle: TextStyle = MaterialTheme.typography.labelMedium
-) {
-    TextRailItem(
-        modifier = modifier,
-        onClick = onClick,
-        text = {
-            AnimatedVisibility(visible = selected) {
-                Row {
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = text,
-                        style = textStyle
-                    )
-                }
-            }
-        },
-        icon = {
-            Icon(
-                painter = painter,
-                contentDescription = text
-            )
-        },
-        selected = selected,
-        selectedPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-        unSelectedPadding = PaddingValues(all = 8.dp),
-    )
 }
 
 @Composable
