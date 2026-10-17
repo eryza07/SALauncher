@@ -18,6 +18,8 @@
 
 package com.movtery.zalithlauncher.ui.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -71,9 +73,6 @@ fun RadioCard(
         )
     }
 }
-
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.shape.RoundedCornerShape
 
 @Composable
 fun RadioCard(

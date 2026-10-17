@@ -18,6 +18,8 @@
 
 package com.movtery.zalithlauncher.ui.screens.content.settings.layouts
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -147,9 +149,6 @@ enum class CardPosition {
      */
     Single
 }
-
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.graphics.Color
 
 /**
  * 根据 UI 组件在组中的位置决定的形状 (Softened Brutalism 12dp)
