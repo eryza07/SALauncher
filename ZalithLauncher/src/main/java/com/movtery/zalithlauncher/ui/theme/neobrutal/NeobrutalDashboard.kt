@@ -292,7 +292,7 @@ private fun UserProfileCard(
     onEditSkin: () -> Unit
 ) {
     val username = account?.username ?: "Belum Ada Akun"
-    val uuidDisplay = account?.uuid?.take(18) ?: "Login untuk bermain"
+    val uuidDisplay = account?.uniqueUUID?.take(18) ?: "Login untuk bermain"
     val authType = account?.let { getAccountTypeName(it) } ?: "BELUM LOGIN"
 
     NeobrutalWindowBox(
