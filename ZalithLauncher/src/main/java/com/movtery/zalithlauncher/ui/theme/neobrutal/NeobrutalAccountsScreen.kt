@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.movtery.zalithlauncher.game.account.Account
+import com.movtery.zalithlauncher.game.account.localLogin
 import com.movtery.zalithlauncher.game.account.AccountsManager
 import com.movtery.zalithlauncher.game.account.getAccountTypeName
 import com.movtery.zalithlauncher.ui.components.SkinPreview3D
@@ -122,10 +123,7 @@ fun NeobrutalAccountsScreen(
                         onClick = {
                             if (offlineUsernameInput.isNotBlank()) {
                                 coroutineScope.launch {
-                                    AccountsManager.createAccount(
-                                        username = offlineUsernameInput.trim(),
-                                        account = null
-                                    )
+                                    localLogin(offlineUsernameInput.trim(), null)
                                     showOfflineDialog = false
                                     offlineUsernameInput = ""
                                 }
