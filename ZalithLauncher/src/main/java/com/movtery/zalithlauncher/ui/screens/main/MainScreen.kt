@@ -524,8 +524,8 @@ private fun NavigationUI(
             onBack = {
                 onBack(backStack)
             },
-            transitionSpec = rememberTransitionSpec(isPop = false),
-            popTransitionSpec = rememberTransitionSpec(isPop = true),
+            transitionSpec = rememberTransitionSpec(),
+            popTransitionSpec = rememberTransitionSpec(),
             entryProvider = entryProvider {
                 entry<NormalNavKey.LauncherMain> {
                     LauncherScreen(
